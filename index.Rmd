@@ -30,6 +30,15 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 # data cleaning
 
 
+## read the leagueoflegends.csv
+
+```{r}
+leagueoflegends = 
+  read_csv(file = "./data/LeagueofLegends.csv") %>% 
+  janitor::clean_names()
+```
+
+
 ## read and clean the tower data
 
 ```{r}
@@ -50,20 +59,21 @@ tower =
   group_by(address) %>% 
   mutate(
     outer_tower = mean(time, na.rm = TRUE)
+  ) %>% 
+  pivot_wider(
+    names_from = lane,
+    values_from = time
   )
 ```
 
 join with the overall dataset
 
 ```{r}
-overall = 
-  read_csv(file = "./data/LeagueofLegends.csv") %>% 
-  janitor::clean_names() %>% 
-  mutate(address = str_remove(address, "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
-  select(address, b_result)
-
 merge_file = 
-  left_join(overall, tower, by = "address") %>% 
+  leagueoflegends %>% 
+  mutate(address = str_remove(address, "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
+  select(address, b_result) %>% 
+  left_join(leagueoflegends, tower, by = "address") %>% 
   mutate(b_result = recode_factor(b_result, "1" = "win", "0" = "lose"))
 ```
 
@@ -79,14 +89,65 @@ merge_file %>%
 ## read and clean the gold data
 
 ```{r}
+gold = 
+  read_csv(file = "./data/gold.csv") %>% 
+  janitor::clean_names() %>% 
+  filter(type == "golddiff") %>% 
+  mutate(
+    address = str_remove(address, "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")
+  ) %>% 
+  pivot_longer(
+  min_1:min_95,
+  names_to = "min", 
+  names_prefix = "min_",
+  values_to = "gold") %>% 
+  drop_na()
 
+gold_ave =
+  gold %>% 
+  group_by(address) %>% 
+  summarize(
+    golddiff_mean = mean(gold)
+  )
+```
+
+combine
+
+```{r}
+gold_mg = 
+  leagueoflegends %>% 
+  mutate(address = str_remove(address, "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
+  select(address, b_result) %>% 
+  left_join(leagueoflegends, gold_ave, by = "address") %>% 
+  mutate(b_result = recode_factor(b_result, "1" = "win", "0" = "lose"))
+```
+
+Plot
+
+```{r}
+gold_mg %>% 
+  ggplot(aes(x = b_result, y = golddiff_mean)) + 
+  geom_boxplot()
 ```
 
 
 ## read and clean the neutral kills data
 
 ```{r}
-
+monster = read_csv("./data/monsters.csv")
+str(monster)
+summary(monster)
+monster = monster %>% 
+  filter(Team %in% c("bDragons", "bBarons", "bHeralds")) %>% 
+  group_by(Address, Type) %>% 
+  summarize(number = n()) %>% 
+  pivot_wider(
+    names_from = Type,
+    values_from = number
+  ) 
+monster[is.na(monster)] = 0
+monster = monster %>% 
+  janitor::clean_names()
 ```
 
 

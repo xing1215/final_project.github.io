@@ -439,9 +439,119 @@ div.tocify {
 </div>
 <div id="read-and-clean-the-gold-data" class="section level2">
 <h2>read and clean the gold data</h2>
+<pre class="r"><code>gold = read_csv(file = &quot;./data/gold.csv&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_double(),
+##   Address = col_character(),
+##   Type = col_character(),
+##   min_69 = col_logical(),
+##   min_70 = col_logical(),
+##   min_71 = col_logical(),
+##   min_72 = col_logical(),
+##   min_73 = col_logical(),
+##   min_74 = col_logical(),
+##   min_75 = col_logical(),
+##   min_76 = col_logical(),
+##   min_77 = col_logical(),
+##   min_78 = col_logical(),
+##   min_79 = col_logical(),
+##   min_80 = col_logical(),
+##   min_81 = col_logical(),
+##   min_82 = col_logical(),
+##   min_83 = col_logical(),
+##   min_84 = col_logical(),
+##   min_85 = col_logical(),
+##   min_86 = col_logical()
+##   # ... with 9 more columns
+## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code>gold_cl = 
+  gold %&gt;% 
+  janitor::clean_names() %&gt;% 
+  filter(type == &quot;golddiff&quot;) %&gt;% 
+  mutate(
+    address = str_remove(address, &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)
+  ) %&gt;% 
+  pivot_longer(
+  min_1:min_95,
+  names_to = &quot;min&quot;, 
+  names_prefix = &quot;min_&quot;,
+  values_to = &quot;gold&quot;) %&gt;% 
+  drop_na()
+
+gold_ave =
+  gold_cl %&gt;% 
+  group_by(address) %&gt;% 
+  summarize(
+    golddiff_mean = mean(gold)
+  )</code></pre>
+<p>combine</p>
+<pre class="r"><code>overall = 
+  read_csv(file = &quot;./data/LeagueofLegends.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  mutate(address = str_remove(address, &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)) %&gt;% 
+  select(address, b_result)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_character(),
+##   Year = col_double(),
+##   bResult = col_double(),
+##   rResult = col_double(),
+##   gamelength = col_double()
+## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code>gold_mg = 
+  left_join(overall, gold_ave, by = &quot;address&quot;) %&gt;% 
+  mutate(b_result = recode_factor(b_result, &quot;1&quot; = &quot;win&quot;, &quot;0&quot; = &quot;lose&quot;))</code></pre>
+<p>Plot</p>
+<pre class="r"><code>gold_mg %&gt;% 
+  ggplot(aes(x = b_result, y = golddiff_mean)) + 
+  geom_boxplot()</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" width="90%" /></p>
 </div>
 <div id="read-and-clean-the-neutral-kills-data" class="section level2">
 <h2>read and clean the neutral kills data</h2>
+<pre class="r"><code>monster = read_csv(&quot;./data/monsters.csv&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   Address = col_character(),
+##   Team = col_character(),
+##   Time = col_double(),
+##   Type = col_character()
+## )</code></pre>
+<pre class="r"><code>str(monster)</code></pre>
+<pre><code>## Classes &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 44248 obs. of  4 variables:
+##  $ Address: chr  &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/30030?gameHash=fbb300951ad8327c&quot; &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/30054?gameHash=055b17da8456fdc8&quot; &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/30054?gameHash=055b17da8456fdc8&quot; &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/30054?gameHash=055b17da8456fdc8&quot; ...
+##  $ Team   : chr  &quot;bDragons&quot; &quot;bDragons&quot; &quot;bDragons&quot; &quot;bDragons&quot; ...
+##  $ Time   : num  37.3 32.5 26.2 19.1 24.6 ...
+##  $ Type   : chr  &quot;DRAGON&quot; &quot;DRAGON&quot; &quot;DRAGON&quot; &quot;DRAGON&quot; ...
+##  - attr(*, &quot;spec&quot;)=
+##   .. cols(
+##   ..   Address = col_character(),
+##   ..   Team = col_character(),
+##   ..   Time = col_double(),
+##   ..   Type = col_character()
+##   .. )</code></pre>
+<pre class="r"><code>summary(monster)</code></pre>
+<pre><code>##    Address              Team                Time            Type          
+##  Length:44248       Length:44248       Min.   : 3.082   Length:44248      
+##  Class :character   Class :character   1st Qu.:16.448   Class :character  
+##  Mode  :character   Mode  :character   Median :23.617   Mode  :character  
+##                                        Mean   :24.169                     
+##                                        3rd Qu.:30.842                     
+##                                        Max.   :92.364</code></pre>
+<pre class="r"><code>monster = monster %&gt;% 
+  filter(Team %in% c(&quot;bDragons&quot;, &quot;bBarons&quot;, &quot;bHeralds&quot;)) %&gt;% 
+  group_by(Address, Type) %&gt;% 
+  summarize(number = n()) %&gt;% 
+  pivot_wider(
+    names_from = Type,
+    values_from = number
+  ) 
+monster[is.na(monster)] = 0
+monster = monster %&gt;% 
+  janitor::clean_names()</code></pre>
 </div>
 <div id="read-and-clean-the-kills-data" class="section level2">
 <h2>read and clean the kills data</h2>

@@ -35,7 +35,9 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```{r}
 leagueoflegends = 
   read_csv(file = "./data/LeagueofLegends.csv") %>% 
-  janitor::clean_names()
+  janitor::clean_names() %>% 
+  mutate(address = str_remove(address, "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
+  select(address, year, b_result)
 ```
 
 
@@ -45,7 +47,7 @@ leagueoflegends =
 tower = 
   read_csv(file = "./data/structures.csv") %>% 
   janitor::clean_names() %>% 
-  filter(team == "bTowers", type == "OUTER_TURRET") %>% 
+  filter(type == "OUTER_TURRET") %>% 
   mutate(
     address = str_remove(address, "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")
   )
@@ -56,23 +58,23 @@ calculate the mean time, group by match id
 ```{r}
 tower = 
   tower %>% 
-  group_by(address) %>% 
+  group_by(address, team) %>% 
   mutate(
     outer_tower = mean(time, na.rm = TRUE)
   ) %>% 
+  select(-lane, -time, -type) %>%
+  distinct() %>% 
   pivot_wider(
-    names_from = lane,
-    values_from = time
-  )
+    names_from = team,
+    values_from = outer_tower
+  ) %>% 
+  mutate(outer_mean_diff = bTowers - rTowers)
 ```
 
-join with the overall dataset
+join with the leagueoflegend dataset
 
 ```{r}
 merge_file = 
-  leagueoflegends %>% 
-  mutate(address = str_remove(address, "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
-  select(address, b_result) %>% 
   left_join(leagueoflegends, tower, by = "address") %>% 
   mutate(b_result = recode_factor(b_result, "1" = "win", "0" = "lose"))
 ```
@@ -81,9 +83,11 @@ some visualizations
 
 ```{r}
 merge_file %>% 
-  ggplot(aes(x = b_result, y = outer_tower)) + 
+  ggplot(aes(x = b_result, y = outer_mean_diff)) + 
   geom_boxplot()
 ```
+
+bTower means the mean time blue team destroy enemy's outer towers among three lanes, rTower means the mean time red team destroy enemy's outer towers among three lanes. We care about the impact of different of mean time between two groups. from the plot, we can see that if bTower is smaller than rTower (meaning that blue teams destroy red teams' outer tower faster) there will be a higher win rate among blue teams
 
 
 ## read and clean the gold data

@@ -198,7 +198,7 @@ origin_df %>%
 ## read and clean the kills data
 
 ```{r,message=FALSE, warning=FALSE}
-kills <- read_csv("./data/kills.csv") %>% 
+kills = read_csv("./data/kills.csv") %>% 
   janitor::clean_names() %>% 
   mutate(address = str_remove(address,
         "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>%         
@@ -210,9 +210,9 @@ kills <- read_csv("./data/kills.csv") %>%
     values_from = "n") %>%
   mutate(diff = bKills - rKills)
 ## merge kills to merge_file.csv
-merge_file <- left_join(merge_file,kills,by="address")
+merge_file = left_join(merge_file,kills,by="address")
 ## relevel b_results
-merge_file <- merge_file %>% 
+merge_file = merge_file %>% 
   mutate(b_result = relevel(b_result,"lose"))
 
 ```
@@ -223,13 +223,19 @@ do some visualization
 merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point()
 merge_file %>%  ggplot((aes(x = b_result,y = diff,group = b_result))) +
-  geom_boxplot() +
+  geom_violin() +
   coord_flip()
 merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point(alpha = 0.5) +
-  stat_smooth(method = "glm", se = FALSE, fullrange = TRUE, 
-              method.args = list(family = binomial))
+  stat_smooth(method = "glm", se = FALSE, method.args = list(family = binomial))
 ```
+
+
+
+
+
+
+
 
 
 

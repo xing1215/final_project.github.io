@@ -431,7 +431,7 @@ div.tocify {
   ggplot(aes(x = b_result, y = outer_mean_diff)) + 
   geom_boxplot() +
   labs(
-    title = &quot;time length of destroying enemy&#39;s towers vs. battle reuslts&quot;, 
+    title = &quot;Fig1: time length of destroying enemy&#39;s towers vs. battle reuslts&quot;, 
     x = &quot;results of blue team&quot;,
     y = &quot;mean time difference of destroying towers&quot;
   )</code></pre>
@@ -466,7 +466,7 @@ gold_ave =
   ggplot(aes(x = b_result, y = golddiff_mean)) + 
   geom_boxplot() +
   labs(
-    title = &quot;total golds difference vs. battle results&quot;,
+    title = &quot;Fig2: total golds difference vs. battle results&quot;,
     x = &quot;results of blue team&quot;, 
     y = &quot;mean gold difference&quot;
   )</code></pre>
@@ -494,8 +494,7 @@ monster[is.na(monster)] = 0</code></pre>
 <p>merge</p>
 <pre class="r"><code>merge_file = left_join(merge_file, monster, by = &quot;address&quot;)</code></pre>
 <p>visualizations</p>
-<pre class="r"><code>plot_only = 
-  merge_file %&gt;% 
+<pre class="r"><code>merge_file %&gt;% 
   janitor::clean_names() %&gt;% 
   pivot_longer(
     baron_nashor:fire_dragon,
@@ -506,7 +505,13 @@ monster[is.na(monster)] = 0</code></pre>
   summarize(number = sum(number, na.rm = TRUE)) %&gt;% 
   ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
   geom_bar(stat = &quot;identity&quot;, position = position_dodge()) + 
-  coord_flip()</code></pre>
+  coord_flip() + 
+  labs(
+    title = &quot;Fig3: numbers of killing neutral monsters vs. battle results&quot;,
+    x = &quot;numbers of kills&quot;,
+    y = &quot;type of neutral monsters&quot;
+  )</code></pre>
+<p><img src="data_source_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
 <pre class="r"><code>origin_df = read_csv(&quot;./data/LeagueofLegends.csv&quot;) %&gt;% janitor::clean_names()
 
 blank_theme &lt;- theme_minimal() +
@@ -554,7 +559,7 @@ origin_df %&gt;%
     values_from = &quot;n&quot;) %&gt;%
   mutate(diff = bKills - rKills)
 ## merge kills to merge_file.csv
-merge_file &lt;- left_join(merge_file,kills,by=&quot;address&quot;)
+merge_file &lt;- left_join(merge_file,kills,by = &quot;address&quot;)
 ## relevel b_results
 merge_file &lt;- merge_file %&gt;% 
   mutate(b_result = relevel(b_result,&quot;lose&quot;))</code></pre>
@@ -564,7 +569,11 @@ merge_file &lt;- merge_file %&gt;%
 <p><img src="data_source_files/figure-html/unnamed-chunk-14-1.png" width="90%" /></p>
 <pre class="r"><code>merge_file %&gt;%  ggplot((aes(x = b_result,y = diff,group = b_result))) +
   geom_boxplot() +
-  coord_flip()</code></pre>
+  labs(
+    title = &quot;Fig4: the mean killing difference vs. battle result&quot;,
+    x = &quot;results of blue team&quot;,
+    y = &quot;mean killing difference&quot;
+  )</code></pre>
 <p><img src="data_source_files/figure-html/unnamed-chunk-14-2.png" width="90%" /></p>
 <pre class="r"><code>merge_file %&gt;% ggplot(aes(x = diff,y = b_result)) + 
   geom_point(alpha = 0.5) +

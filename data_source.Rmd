@@ -88,7 +88,7 @@ merge_file %>%
   ggplot(aes(x = b_result, y = outer_mean_diff)) + 
   geom_boxplot() +
   labs(
-    title = "time length of destroying enemy's towers vs. battle reuslts", 
+    title = "Fig1: time length of destroying enemy's towers vs. battle reuslts", 
     x = "results of blue team",
     y = "mean time difference of destroying towers"
   )
@@ -132,7 +132,7 @@ merge_file %>%
   ggplot(aes(x = b_result, y = golddiff_mean)) + 
   geom_boxplot() +
   labs(
-    title = "total golds difference vs. battle results",
+    title = "Fig2: total golds difference vs. battle results",
     x = "results of blue team", 
     y = "mean gold difference"
   )
@@ -170,8 +170,7 @@ merge_file = left_join(merge_file, monster, by = "address")
 visualizations
 
 ```{r}
-plot_only = 
-  merge_file %>% 
+merge_file %>% 
   janitor::clean_names() %>% 
   pivot_longer(
     baron_nashor:fire_dragon,
@@ -182,7 +181,12 @@ plot_only =
   summarize(number = sum(number, na.rm = TRUE)) %>% 
   ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
   geom_bar(stat = "identity", position = position_dodge()) + 
-  coord_flip()
+  coord_flip() + 
+  labs(
+    title = "Fig3: numbers of killing neutral monsters vs. battle results",
+    x = "numbers of kills",
+    y = "type of neutral monsters"
+  )
 ```
 
 ```{r,message=FALSE, warning=FALSE}
@@ -235,7 +239,7 @@ kills <- read_csv("./data/kills.csv") %>%
     values_from = "n") %>%
   mutate(diff = bKills - rKills)
 ## merge kills to merge_file.csv
-merge_file <- left_join(merge_file,kills,by="address")
+merge_file <- left_join(merge_file,kills,by = "address")
 ## relevel b_results
 merge_file <- merge_file %>% 
   mutate(b_result = relevel(b_result,"lose"))
@@ -247,9 +251,15 @@ do some visualization
 ```{r,message=FALSE, warning=FALSE}
 merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point()
+
 merge_file %>%  ggplot((aes(x = b_result,y = diff,group = b_result))) +
   geom_boxplot() +
-  coord_flip()
+  labs(
+    title = "Fig4: the mean killing difference vs. battle result",
+    x = "results of blue team",
+    y = "mean killing difference"
+  )
+
 merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point(alpha = 0.5) +
   stat_smooth(method = "glm", se = FALSE, fullrange = TRUE, 

@@ -523,7 +523,8 @@ div.tocify {
 ##                                        Mean   :24.169                     
 ##                                        3rd Qu.:30.842                     
 ##                                        Max.   :92.364</code></pre>
-<pre class="r"><code>monster = monster %&gt;% 
+<pre class="r"><code>monster = 
+  monster %&gt;% 
   filter(Team %in% c(&quot;bDragons&quot;, &quot;bBarons&quot;, &quot;bHeralds&quot;)) %&gt;% 
   group_by(Address, Type) %&gt;% 
   summarize(number = n()) %&gt;% 
@@ -534,6 +535,49 @@ div.tocify {
 monster[is.na(monster)] = 0
 monster = monster %&gt;% 
   janitor::clean_names()</code></pre>
+<p>merge</p>
+<pre class="r"><code>merge_file = left_join(merge_file, monster, by = &quot;address&quot;)</code></pre>
+<p>visualizations</p>
+<pre class="r"><code>origin_df = read_csv(&quot;./data/LeagueofLegends.csv&quot;) %&gt;% janitor::clean_names()</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_character(),
+##   Year = col_double(),
+##   bResult = col_double(),
+##   rResult = col_double(),
+##   gamelength = col_double()
+## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code>blank_theme &lt;- theme_minimal() +
+  theme(
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  panel.border = element_blank(),
+  panel.grid = element_blank(),
+  axis.ticks = element_blank(),
+  plot.title = element_text(size = 14, face = &quot;bold&quot;)
+  )
+origin_df %&gt;% 
+  select(b_result, r_result) %&gt;% 
+  mutate(b_wins = sum(b_result), r_wins = sum(r_result), total = b_wins + r_wins) %&gt;% 
+  select(b_wins:total) %&gt;%
+  pivot_longer(
+    b_wins:r_wins,
+    names_to = &quot;team&quot;,
+    values_to = &quot;game_won&quot;
+  ) %&gt;% 
+  filter(row_number() &lt;= 2) %&gt;% 
+  ggplot(aes(x = &quot;&quot;, y = game_won, fill = team)) +
+  geom_bar(stat = &quot;identity&quot;, width = 1) +
+  geom_text(aes(label = percent(game_won / total)), position = position_stack(vjust = 0.5)) +
+  coord_polar(&quot;y&quot;) +
+  labs(  
+    title = &quot;Win rates of Blue and Red teams across all years&quot;
+  ) +
+  scale_fill_manual(labels = c(&quot;Blue&quot;, &quot;Red&quot;), values = c(&quot;cadetblue1&quot;, &quot;coral1&quot;)) + 
+  blank_theme +
+  theme(axis.text.x = element_blank())</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
 </div>
 <div id="read-and-clean-the-kills-data" class="section level2">
 <h2>read and clean the kills data</h2>

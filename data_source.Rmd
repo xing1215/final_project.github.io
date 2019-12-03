@@ -134,22 +134,23 @@ The figure above shows the average gold difference across the whole game when bl
 ## read and clean the neutral kills data
 
 ```{r,message=FALSE, warning=FALSE}
-monster = read_csv("./data/monsters.csv")
-str(monster)
-summary(monster)
+monster = 
+  read_csv("./data/monsters.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    address = str_remove(address, "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")
+  )
 
 monster = 
   monster %>% 
-  filter(Team %in% c("bDragons", "bBarons", "bHeralds")) %>% 
-  group_by(Address, Type) %>% 
+  filter(team %in% c("bDragons", "bBarons", "bHeralds")) %>% 
+  group_by(address, type) %>% 
   summarize(number = n()) %>% 
   pivot_wider(
-    names_from = Type,
+    names_from = type,
     values_from = number
   ) 
 monster[is.na(monster)] = 0
-monster = monster %>% 
-  janitor::clean_names()
 ```
 
 merge
@@ -230,6 +231,11 @@ merge_file %>% ggplot(aes(x = diff,y = b_result)) +
   stat_smooth(method = "glm", se = FALSE, method.args = list(family = binomial))
 ```
 
+## export to csv
+
+```{r}
+write.csv(merge_file,"./data/merge.csv", row.names = FALSE)
+```
 
 
 

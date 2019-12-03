@@ -50,6 +50,7 @@ mult_log %>%
 ```
 
 ```{r}
+my_data = mtcars[merge_file, c(3,4)]
 mcor = round(cor(merge_file),3)
 mcor
 ```

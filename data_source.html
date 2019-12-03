@@ -466,43 +466,39 @@ gold_ave =
 </div>
 <div id="read-and-clean-the-neutral-kills-data" class="section level2">
 <h2>read and clean the neutral kills data</h2>
-<pre class="r"><code>monster = read_csv(&quot;./data/monsters.csv&quot;)
-str(monster)</code></pre>
-<pre><code>## Classes &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 44248 obs. of  4 variables:
-##  $ Address: chr  &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/30030?gameHash=fbb300951ad8327c&quot; &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/30054?gameHash=055b17da8456fdc8&quot; &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/30054?gameHash=055b17da8456fdc8&quot; &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/30054?gameHash=055b17da8456fdc8&quot; ...
-##  $ Team   : chr  &quot;bDragons&quot; &quot;bDragons&quot; &quot;bDragons&quot; &quot;bDragons&quot; ...
-##  $ Time   : num  37.3 32.5 26.2 19.1 24.6 ...
-##  $ Type   : chr  &quot;DRAGON&quot; &quot;DRAGON&quot; &quot;DRAGON&quot; &quot;DRAGON&quot; ...
-##  - attr(*, &quot;spec&quot;)=
-##   .. cols(
-##   ..   Address = col_character(),
-##   ..   Team = col_character(),
-##   ..   Time = col_double(),
-##   ..   Type = col_character()
-##   .. )</code></pre>
-<pre class="r"><code>summary(monster)</code></pre>
-<pre><code>##    Address              Team                Time            Type          
-##  Length:44248       Length:44248       Min.   : 3.082   Length:44248      
-##  Class :character   Class :character   1st Qu.:16.448   Class :character  
-##  Mode  :character   Mode  :character   Median :23.617   Mode  :character  
-##                                        Mean   :24.169                     
-##                                        3rd Qu.:30.842                     
-##                                        Max.   :92.364</code></pre>
 <pre class="r"><code>monster = 
+  read_csv(&quot;./data/monsters.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  mutate(
+    address = str_remove(address, &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)
+  )
+
+monster = 
   monster %&gt;% 
-  filter(Team %in% c(&quot;bDragons&quot;, &quot;bBarons&quot;, &quot;bHeralds&quot;)) %&gt;% 
-  group_by(Address, Type) %&gt;% 
+  filter(team %in% c(&quot;bDragons&quot;, &quot;bBarons&quot;, &quot;bHeralds&quot;)) %&gt;% 
+  group_by(address, type) %&gt;% 
   summarize(number = n()) %&gt;% 
   pivot_wider(
-    names_from = Type,
+    names_from = type,
     values_from = number
   ) 
-monster[is.na(monster)] = 0
-monster = monster %&gt;% 
-  janitor::clean_names()</code></pre>
+monster[is.na(monster)] = 0</code></pre>
 <p>merge</p>
 <pre class="r"><code>merge_file = left_join(merge_file, monster, by = &quot;address&quot;)</code></pre>
 <p>visualizations</p>
+<pre class="r"><code>merge_file %&gt;% 
+  janitor::clean_names() %&gt;% 
+  pivot_longer(
+    baron_nashor:fire_dragon,
+    names_to = &quot;neutral_monster&quot;,
+    values_to = &quot;number&quot;
+  ) %&gt;% 
+  group_by(b_result, neutral_monster) %&gt;% 
+  summarize(number = sum(number, na.rm = TRUE)) %&gt;% 
+  ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
+  geom_bar(stat = &quot;identity&quot;, position = position_dodge()) + 
+  coord_flip()</code></pre>
+<p><img src="data_source_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
 <pre class="r"><code>origin_df = read_csv(&quot;./data/LeagueofLegends.csv&quot;) %&gt;% janitor::clean_names()
 
 blank_theme &lt;- theme_minimal() +
@@ -534,19 +530,14 @@ origin_df %&gt;%
   scale_fill_manual(labels = c(&quot;Blue&quot;, &quot;Red&quot;), values = c(&quot;cadetblue1&quot;, &quot;coral1&quot;)) + 
   blank_theme +
   theme(axis.text.x = element_blank())</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
+<p><img src="data_source_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
 </div>
 <div id="read-and-clean-the-kills-data" class="section level2">
 <h2>read and clean the kills data</h2>
-<pre class="r"><code>kills &lt;- read_csv(&quot;./data/kills.csv&quot;)
-## set key
-key &lt;- pull(origin_df,address) %&gt;% as_tibble()
-## merged the kills.csv with key
-colnames(key) &lt;- &quot;address&quot;
-kills &lt;- kills %&gt;% janitor::clean_names()
-kills_all &lt;- left_join(key, kills, by = &quot;address&quot;)
-## calculate kill difference between blue team and red team
-kills_diff &lt;- kills_all %&gt;% 
+<pre class="r"><code>kills &lt;- read_csv(&quot;./data/kills.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  mutate(address = str_remove(address,
+        &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)) %&gt;%         
   group_by(address,team) %&gt;%
   select(address,team) %&gt;% 
   summarize(n = n()) %&gt;% 
@@ -554,23 +545,28 @@ kills_diff &lt;- kills_all %&gt;%
     names_from = &quot;team&quot;,
     values_from = &quot;n&quot;) %&gt;%
   mutate(diff = bKills - rKills)
-## extract bResult from dataset
-outcome &lt;- pull(origin_df,b_result) %&gt;% as_tibble()
-colnames(outcome) &lt;- &quot;bresult&quot;
-df &lt;- bind_cols(kills_diff,outcome)</code></pre>
+## merge kills to merge_file.csv
+merge_file &lt;- left_join(merge_file,kills,by=&quot;address&quot;)
+## relevel b_results
+merge_file &lt;- merge_file %&gt;% 
+  mutate(b_result = relevel(b_result,&quot;lose&quot;))</code></pre>
 <p>do some visualization</p>
-<pre class="r"><code>df %&gt;% ggplot(aes(x = diff,y = bresult)) + 
+<pre class="r"><code>merge_file %&gt;% ggplot(aes(x = diff,y = b_result)) + 
   geom_point()</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-13-1.png" width="90%" /></p>
-<pre class="r"><code>df %&gt;%  ggplot((aes(x = bresult,y = diff,group = bresult))) +
+<p><img src="data_source_files/figure-html/unnamed-chunk-14-1.png" width="90%" /></p>
+<pre class="r"><code>merge_file %&gt;%  ggplot((aes(x = b_result,y = diff,group = b_result))) +
   geom_boxplot() +
   coord_flip()</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-13-2.png" width="90%" /></p>
-<pre class="r"><code>df %&gt;% ggplot(aes(x = diff,y = bresult)) + 
+<p><img src="data_source_files/figure-html/unnamed-chunk-14-2.png" width="90%" /></p>
+<pre class="r"><code>merge_file %&gt;% ggplot(aes(x = diff,y = b_result)) + 
   geom_point(alpha = 0.5) +
   stat_smooth(method = &quot;glm&quot;, se = FALSE, fullrange = TRUE, 
               method.args = list(family = binomial))</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-13-3.png" width="90%" /></p>
+<p><img src="data_source_files/figure-html/unnamed-chunk-14-3.png" width="90%" /></p>
+</div>
+<div id="export-to-csv" class="section level2">
+<h2>export to csv</h2>
+<pre class="r"><code>write.csv(merge_file,&quot;./data/merge.csv&quot;, row.names = FALSE)</code></pre>
 </div>
 </div>
 

@@ -18,7 +18,7 @@ League of Legends (LoL) is an immensely popular multiplayer online battle arena 
 
 # Motivation
 
-All of our team members love League of Legends so much and this game has become an integral part of our lives. We really enjoy winning the game, but we are not always win. We know the taste of failure very well . So we are very curious about the deteminants of winning the game, other than personal technologies and team cooperation with these unmeasurable data.
+All of our team members love League of Legends so much and this game has become an integral part of our lives. We really enjoy winning the game, but we are not always win. We know the taste of failure very well. So we are very curious about the deteminants of winning the game, other than personal technologies and team cooperation with these unmeasurable data.
 
 # Data
 * **League of Legends match data**

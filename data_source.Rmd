@@ -134,22 +134,23 @@ The figure above shows the average gold difference across the whole game when bl
 ## read and clean the neutral kills data
 
 ```{r,message=FALSE, warning=FALSE}
-monster = read_csv("./data/monsters.csv")
-str(monster)
-summary(monster)
+monster = 
+  read_csv("./data/monsters.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    address = str_remove(address, "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")
+  )
 
 monster = 
   monster %>% 
-  filter(Team %in% c("bDragons", "bBarons", "bHeralds")) %>% 
-  group_by(Address, Type) %>% 
+  filter(team %in% c("bDragons", "bBarons", "bHeralds")) %>% 
+  group_by(address, type) %>% 
   summarize(number = n()) %>% 
   pivot_wider(
-    names_from = Type,
+    names_from = type,
     values_from = number
   ) 
 monster[is.na(monster)] = 0
-monster = monster %>% 
-  janitor::clean_names()
 ```
 
 merge
@@ -159,6 +160,21 @@ merge_file = left_join(merge_file, monster, by = "address")
 ```
 
 visualizations
+
+```{r}
+merge_file %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    baron_nashor:fire_dragon,
+    names_to = "neutral_monster",
+    values_to = "number"
+  ) %>% 
+  group_by(b_result, neutral_monster) %>% 
+  summarize(number = sum(number, na.rm = TRUE)) %>% 
+  ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
+  geom_bar(stat = "identity", position = position_dodge()) + 
+  coord_flip()
+```
 
 ```{r,message=FALSE, warning=FALSE}
 origin_df = read_csv("./data/LeagueofLegends.csv") %>% janitor::clean_names()
@@ -198,15 +214,10 @@ origin_df %>%
 ## read and clean the kills data
 
 ```{r,message=FALSE, warning=FALSE}
-kills <- read_csv("./data/kills.csv")
-## set key
-key <- pull(origin_df,address) %>% as_tibble()
-## merged the kills.csv with key
-colnames(key) <- "address"
-kills <- kills %>% janitor::clean_names()
-kills_all <- left_join(key, kills, by = "address")
-## calculate kill difference between blue team and red team
-kills_diff <- kills_all %>% 
+kills <- read_csv("./data/kills.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(address = str_remove(address,
+        "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>%         
   group_by(address,team) %>%
   select(address,team) %>% 
   summarize(n = n()) %>% 
@@ -214,25 +225,32 @@ kills_diff <- kills_all %>%
     names_from = "team",
     values_from = "n") %>%
   mutate(diff = bKills - rKills)
-## extract bResult from dataset
-outcome <- pull(origin_df,b_result) %>% as_tibble()
-colnames(outcome) <- "bresult"
-df <- bind_cols(kills_diff,outcome)
+## merge kills to merge_file.csv
+merge_file <- left_join(merge_file,kills,by="address")
+## relevel b_results
+merge_file <- merge_file %>% 
+  mutate(b_result = relevel(b_result,"lose"))
+
 ```
 
 do some visualization
 
 ```{r,message=FALSE, warning=FALSE}
-df %>% ggplot(aes(x = diff,y = bresult)) + 
+merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point()
-df %>%  ggplot((aes(x = bresult,y = diff,group = bresult))) +
+merge_file %>%  ggplot((aes(x = b_result,y = diff,group = b_result))) +
   geom_boxplot() +
   coord_flip()
-df %>% ggplot(aes(x = diff,y = bresult)) + 
+merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point(alpha = 0.5) +
   stat_smooth(method = "glm", se = FALSE, fullrange = TRUE, 
               method.args = list(family = binomial))
 ```
 
+## export to csv
+
+```{r}
+write.csv(merge_file,"./data/merge.csv", row.names = FALSE)
+```
 
 

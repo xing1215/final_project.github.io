@@ -1,0 +1,75 @@
+---
+title: "Shiny Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(readr)
+library(tidyverse)
+library(viridis)
+library(plotly)
+```
+
+
+```{r}
+merge = 
+  read_csv(file = "./data/merge.csv") %>% 
+  janitor::clean_names()
+
+origin_df = 
+  read_csv("./data/LeagueofLegends.csv") %>% 
+  janitor::clean_names()
+```
+
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+year = 
+  origin_df %>% 
+  distinct(year) %>% 
+  mutate(
+    year = recode_factor(year, "2014" = "S4", "2015" = "S5", "2016" = "S6", "2017" = "S7", "2018" = "S8"), 
+    year = fct_relevel(year, "S4", "S5", "S6", "S7", "S8")
+  ) %>% pull()
+
+# selectInput widget, something like a dropdown menu
+
+selectInput(
+  "year_choice", 
+  label = h3("Select year"),
+  choices = year, 
+  selected = "S8"
+)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
+

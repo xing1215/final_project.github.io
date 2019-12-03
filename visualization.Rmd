@@ -16,7 +16,11 @@ Variable golddiff_mean represents the average monetary difference in every minut
 
 ![](kills_diff.png)
 
+<<<<<<< HEAD
 Variable 
+=======
+
+>>>>>>> f3746e126116f21fdc72d04e156cd6a956008477
 
 ![](monster_diff.png)
 

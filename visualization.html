@@ -425,26 +425,60 @@ merge_file %&gt;%
   ggplot(aes(x = b_result, y = outer_mean_diff)) + 
   geom_boxplot() +
   labs(
-    title = &quot;Fig1: Time Length of Destroying Enemy&#39;s Towers vs. Battle Reuslts&quot;, 
+    title = &quot;Fig1: Mean Time Length of Destroying Enemy&#39;s Outter Towers&quot;, 
     x = &quot;Results of Blue Team&quot;,
     y = &quot;Mean Time Difference of Destroying Towers&quot;
   )</code></pre>
 <p><img src="visualization_files/figure-html/unnamed-chunk-2-1.png" width="90%" /></p>
-<p>Variable outer_mean_diff represents the difference of average time destroying the enemy’s three outer towers between blue and red team (i.e. outer_mean_diff = average time blue team used - average time red team used). And vairable b_result, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expect that the blue team has a greater chance to win the game when the difference is negative, meaning the blue team takes less average time to destory the red team’s outer towers.</p>
+<p>Variable <em>outer_mean_diff</em> represents the difference of average time destroying the enemy’s three outer towers between blue and red team (i.e. <em>outer_mean_diff</em> = average time blue team used - average time red team used). And vairable <em>b_result</em>, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expect that the blue team has a greater chance to win the game when the <strong>difference is negative</strong>, meaning the blue team takes less average time to destory the red team’s outer towers.</p>
 </div>
 <div id="fig-2-team-economic-differences" class="section level2">
 <h2>Fig 2 Team Economic Differences</h2>
-<p><img src="gold_diff.png" /></p>
-<p>Variable golddiff_mean represents the average monetary difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has more golds in average.</p>
+<pre class="r"><code>merge_file %&gt;% 
+  ggplot(aes(x = b_result, y = golddiff_mean)) + 
+  geom_boxplot() +
+  labs(
+    title = &quot;Fig2: Mean Golds Difference&quot;,
+    x = &quot;Results of Blue Team&quot;, 
+    y = &quot;Mean Gold Difference&quot;
+  )</code></pre>
+<p><img src="visualization_files/figure-html/unnamed-chunk-3-1.png" width="90%" /></p>
+<p>Variable <em>golddiff_mean</em> represents the average monetary difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has <strong>more golds</strong> than red team in average.</p>
 </div>
 <div id="fig-3-neutrals-eliminated" class="section level2">
 <h2>Fig 3 Neutrals Eliminated</h2>
-<p><img src="monster_diff.png" /></p>
-<p>In this figure, we try to explore which neutral monsters have a higher effects in contributing to the battle results. The largest difference exists in the kills of baron_nashor.</p>
+<pre class="r"><code>merge_file %&gt;% 
+  janitor::clean_names() %&gt;% 
+  pivot_longer(
+    baron_nashor:fire_dragon,
+    names_to = &quot;neutral_monster&quot;,
+    values_to = &quot;number&quot;
+  ) %&gt;% 
+  group_by(b_result, neutral_monster) %&gt;% 
+  summarize(number = sum(number, na.rm = TRUE)) %&gt;% 
+  ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
+  geom_bar(stat = &quot;identity&quot;, position = position_dodge()) + 
+  coord_flip() + 
+  labs(
+    title = &quot;Fig3: Numbers and Categories of Killing Neutral Monsters&quot;,
+    x = &quot;Numbers of Kills&quot;,
+    y = &quot;Categories of Neutral Monsters&quot;
+  )</code></pre>
+<p><img src="visualization_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
+<p>In this figure, we try to explore which neutral monsters have a higher effects in contributing to the battle results. The largest difference exists in the kills of <strong>Baron Nashor</strong>.</p>
 </div>
 <div id="fig-4-team-kills-differences" class="section level2">
 <h2>Fig 4 Team Kills Differences</h2>
-<p><img src="kills_diff.png" /></p>
+<pre class="r"><code>merge_file %&gt;%  
+  ggplot((aes(x = b_result,y = diff,group = b_result))) +
+  geom_boxplot() +
+  labs(
+    title = &quot;Fig4: Mean Killing Difference&quot;,
+    x = &quot;Results of Blue Team&quot;,
+    y = &quot;Mean Killing Difference&quot;
+  )</code></pre>
+<p><img src="visualization_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
+<p>Variable <em>diff</em> represents the average kill difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has <strong>more kills</strong> than red team in average.</p>
 </div>
 
 

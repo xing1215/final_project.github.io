@@ -40,30 +40,70 @@ merge_file %>%
   ggplot(aes(x = b_result, y = outer_mean_diff)) + 
   geom_boxplot() +
   labs(
-    title = "Fig1: Time Length of Destroying Enemy's Towers vs. Battle Reuslts", 
+    title = "Fig1: Mean Time Length of Destroying Enemy's Outter Towers", 
     x = "Results of Blue Team",
     y = "Mean Time Difference of Destroying Towers"
   )
 ```
 
 
-Variable outer_mean_diff represents the difference of average time destroying the enemy's three outer towers between blue and red team (i.e. outer_mean_diff = average time blue team used - average time red team used). And vairable b_result, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expect that the blue team has a greater chance to win the game when the difference is negative, meaning the blue team takes less average time to destory the red team's outer towers.
+Variable *outer_mean_diff* represents the difference of average time destroying the enemy's three outer towers between blue and red team (i.e. *outer_mean_diff* = average time blue team used - average time red team used). And vairable *b_result*, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expect that the blue team has a greater chance to win the game when the **difference is negative**, meaning the blue team takes less average time to destory the red team's outer towers.
 
 ## Fig 2 Team Economic Differences
 
-![](gold_diff.png)
 
-Variable golddiff_mean represents the average monetary difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has more golds in average.
+```{r, message=FALSE, warning=FALSE}
+merge_file %>% 
+  ggplot(aes(x = b_result, y = golddiff_mean)) + 
+  geom_boxplot() +
+  labs(
+    title = "Fig2: Mean Golds Difference",
+    x = "Results of Blue Team", 
+    y = "Mean Gold Difference"
+  )
+```
+
+
+Variable *golddiff_mean* represents the average monetary difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has **more golds** than red team in average.
 
 ## Fig 3 Neutrals Eliminated
 
-![](monster_diff.png)
+```{r, message=FALSE, warning=FALSE}
+merge_file %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    baron_nashor:fire_dragon,
+    names_to = "neutral_monster",
+    values_to = "number"
+  ) %>% 
+  group_by(b_result, neutral_monster) %>% 
+  summarize(number = sum(number, na.rm = TRUE)) %>% 
+  ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
+  geom_bar(stat = "identity", position = position_dodge()) + 
+  coord_flip() + 
+  labs(
+    title = "Fig3: Numbers and Categories of Killing Neutral Monsters",
+    x = "Numbers of Kills",
+    y = "Categories of Neutral Monsters"
+  )
+```
 
-In this figure, we try to explore which neutral monsters have a higher effects in contributing to the battle results. The largest difference exists in the kills of baron_nashor. 
+
+In this figure, we try to explore which neutral monsters have a higher effects in contributing to the battle results. The largest difference exists in the kills of **Baron Nashor**. 
 
 ## Fig 4 Team Kills Differences
 
-![](kills_diff.png)
+```{r, message=FALSE, warning=FALSE}
+merge_file %>%  
+  ggplot((aes(x = b_result,y = diff,group = b_result))) +
+  geom_boxplot() +
+  labs(
+    title = "Fig4: Mean Killing Difference",
+    x = "Results of Blue Team",
+    y = "Mean Killing Difference"
+  )
+```
 
+Variable *diff* represents the average kill difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has **more kills** than red team in average.
 
 

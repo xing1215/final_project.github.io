@@ -12,7 +12,7 @@
 
 
 
-<title>League of Legends</title>
+<title>League of Legends Prediction</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -24,6 +24,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
@@ -250,6 +251,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -370,14 +374,53 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
-
-
-<h1 class="title toc-ignore">League of Legends</h1>
-
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
 </div>
 
 
 
+<h1 class="title toc-ignore">League of Legends Prediction</h1>
+
+</div>
+
+
+<p><img src="lol.png" style="width:70%"></p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>League of Legends (LoL) is an immensely popular multiplayer online battle arena game, with over 100 million monthly active users worldwide. It hosts progressional competitions throughout the year and had 43 million viewers in the 2016 World Championships alone. For context, that’s more than the 30.8 million viewers that watched Game 7 of the 2016 NBA finals! Published by Riot Games, LOL is clearly fun and addictive once you get started. For those who haven’t, here’s a quick overview of the game itself.</p>
+<p>10 players are divided into 2 teams (blue or red) in the main LoL game (there are 3 modes). The objective for each team is to destroy the opposing teams “Nexus”. Think of the Nexus as the main building in a base camp. Destroy the enemy Nexus and your team wins the game. Protect yours or your team loses the game. Simple enough. However, the collaboration often required between teammates to advance on the enemy Nexus, while defending its own, is wonderfully complex.</p>
+<p><img src="map.png" style="width:80%"></p>
+</div>
+<div id="motivation" class="section level1">
+<h1>Motivation</h1>
+<p>Our team members all love League of Legends so much that this game has become an integral part of our lives. We really enjoy the joy of winning in this game, but there is no one who always wins in the game, and we often taste the taste of failure. So we are very curious, in addition to personal technology and team cooperation with these unmeasurable data, what other factors will affect the outcome of the game.</p>
+</div>
+<div id="data" class="section level1">
+<h1>Data</h1>
+<ul>
+<li><strong>League of Legends match data</strong> We used <a href="https://www.kaggle.com/chuckephron/leagueoflegends">League of Legends competitive matches dataset</a> to obtain matches data between 2015 to 2018 from <a href="https://www.kaggle.com/">kaggle</a>, a data modeling and data analysis competition platform.</li>
+</ul>
+<div id="important-indicators-and-explanations" class="section level2">
+<h2>Important Indicators and Explanations</h2>
+<ul>
+<li><p><strong>Kills</strong> Killing is a very important player behavior in League of Legends games. The meaning is specifically that the champion controlled by the player kills or is killed by the enemy champions, just like the Pokémon you used in the Pokémon game is defeated by the opponent’s Pokémon. Killing has a huge potential impact on the progress of the game. On the one hand, killing will bring money to your team so that you have more money to buy powerful equipments to make their champions stronger. On the other hand, killed enemy champions will enter resurrection time and will not be able to act during resurrection time.</p></li>
+<li><p><strong>Tower</strong> The way to win the League of Legends game is to destroy the opponent’s “Nexus base”. However, before reaching the “Nexus base”, your team should take down towers in order to reveal the “Nexus base”. “Nexus base” cannot be attacked before some of the towers have fallen. Also, destroying the tower can bring more money and map control to your side, which is crucial to the win.</p></li>
+<li><p><strong>Monsters</strong> There are many neutral monsters in the game map. After killing certain monsters, not only will there be monetary rewards, but also additional special effect gains(buff). Three of the most important monsters include Dragon(with 5 different types), Rift Herald and Baron Nashor.</p></li>
+<li><p><strong>Glods</strong> Glod is literally money which enable the players to buy powerful equipments for the champions they controlled. There are many ways to earn money in the game, such as the ones mentioned above: kills, take down towers and kill the netural monsters. A gold lead will give your team a huge game advantage, which will drive your team to victory.</p></li>
+</ul>
+</div>
+</div>
+<div id="methods" class="section level1">
+<h1>Methods</h1>
+</div>
+<div id="results" class="section level1">
+<h1>Results</h1>
+</div>
 
 
 
@@ -414,6 +457,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 <script>
 $(document).ready(function ()  {

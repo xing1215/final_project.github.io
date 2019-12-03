@@ -559,14 +559,14 @@ outcome &lt;- pull(origin_df,b_result) %&gt;% as_tibble()
 colnames(outcome) &lt;- &quot;bresult&quot;
 df &lt;- bind_cols(kills_diff,outcome)</code></pre>
 <p>do some visualization</p>
-<pre class="r"><code>df %&gt;% ggplot(aes(x = diff,y = bresult)) +
+<pre class="r"><code>df %&gt;% ggplot(aes(x = diff,y = bresult)) + 
   geom_point()</code></pre>
 <p><img src="data_source_files/figure-html/unnamed-chunk-13-1.png" width="90%" /></p>
 <pre class="r"><code>df %&gt;%  ggplot((aes(x = bresult,y = diff,group = bresult))) +
   geom_boxplot() +
   coord_flip()</code></pre>
 <p><img src="data_source_files/figure-html/unnamed-chunk-13-2.png" width="90%" /></p>
-<pre class="r"><code>df %&gt;% ggplot(aes(x = diff,y = bresult)) +
+<pre class="r"><code>df %&gt;% ggplot(aes(x = diff,y = bresult)) + 
   geom_point(alpha = 0.5) +
   stat_smooth(method = &quot;glm&quot;, se = FALSE, fullrange = TRUE, 
               method.args = list(family = binomial))</code></pre>

@@ -223,12 +223,12 @@ df <- bind_cols(kills_diff,outcome)
 do some visualization
 
 ```{r,message=FALSE, warning=FALSE}
-df %>% ggplot(aes(x = diff,y = bresult)) +
+df %>% ggplot(aes(x = diff,y = bresult)) + 
   geom_point()
 df %>%  ggplot((aes(x = bresult,y = diff,group = bresult))) +
   geom_boxplot() +
   coord_flip()
-df %>% ggplot(aes(x = diff,y = bresult)) +
+df %>% ggplot(aes(x = diff,y = bresult)) + 
   geom_point(alpha = 0.5) +
   stat_smooth(method = "glm", se = FALSE, fullrange = TRUE, 
               method.args = list(family = binomial))

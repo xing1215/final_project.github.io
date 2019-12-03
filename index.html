@@ -581,6 +581,53 @@ origin_df %&gt;%
 </div>
 <div id="read-and-clean-the-kills-data" class="section level2">
 <h2>read and clean the kills data</h2>
+<pre class="r"><code>kills &lt;- read_csv(&quot;./data/kills.csv&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   Address = col_character(),
+##   Team = col_character(),
+##   Time = col_double(),
+##   Victim = col_character(),
+##   Killer = col_character(),
+##   Assist_1 = col_character(),
+##   Assist_2 = col_character(),
+##   Assist_3 = col_character(),
+##   Assist_4 = col_character(),
+##   x_pos = col_character(),
+##   y_pos = col_character()
+## )</code></pre>
+<pre class="r"><code>## set key
+key &lt;- pull(origin_df,address) %&gt;% as_tibble()
+## merged the kills.csv with key
+colnames(key) &lt;- &quot;address&quot;
+kills &lt;- kills %&gt;% janitor::clean_names()
+kills_all &lt;- left_join(key, kills, by = &quot;address&quot;)
+## calculate kill difference between blue team and red team
+kills_diff &lt;- kills_all %&gt;% 
+  group_by(address,team) %&gt;%
+  select(address,team) %&gt;% 
+  summarize(n = n()) %&gt;% 
+  pivot_wider(
+    names_from = &quot;team&quot;,
+    values_from = &quot;n&quot;) %&gt;%
+  mutate(diff = bKills - rKills)
+## extract bResult from dataset
+outcome &lt;- pull(origin_df,b_result) %&gt;% as_tibble()
+colnames(outcome) &lt;- &quot;bresult&quot;
+df &lt;- bind_cols(kills_diff,outcome)</code></pre>
+<p>do some visualization</p>
+<pre class="r"><code>df %&gt;% ggplot(aes(x = diff,y = bresult)) +
+  geom_point()</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-13-1.png" width="90%" /></p>
+<pre class="r"><code>df %&gt;%  ggplot((aes(x = bresult,y = diff,group = bresult))) +
+  geom_boxplot() +
+  coord_flip()</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-13-2.png" width="90%" /></p>
+<pre class="r"><code>df %&gt;% ggplot(aes(x = diff,y = bresult)) +
+  geom_point(alpha = 0.5) +
+  stat_smooth(method = &quot;glm&quot;, se = FALSE, fullrange = TRUE, 
+              method.args = list(family = binomial))</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-13-3.png" width="90%" /></p>
 </div>
 </div>
 

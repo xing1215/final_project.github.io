@@ -6,9 +6,8 @@ navbar:
   right:
     - text: "EDA"
       href: visualization.html
-
-    - text: "Model"
-      href: .html
+    - text: "Shiny"
+      href: https://xing1215.shinyapps.io/shiny/
     - text: "Hero"
       href: .html
     - text: "Report"

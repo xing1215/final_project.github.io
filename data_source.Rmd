@@ -232,5 +232,10 @@ merge_file %>% ggplot(aes(x = diff,y = b_result)) +
               method.args = list(family = binomial))
 ```
 
+## export to csv
+
+```{r}
+write.csv(merge_file,"./data/merge.csv", row.names = FALSE)
+```
 
 

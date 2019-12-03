@@ -496,7 +496,8 @@ monster[is.na(monster)] = 0</code></pre>
   group_by(b_result, neutral_monster) %&gt;% 
   summarize(number = sum(number, na.rm = TRUE)) %&gt;% 
   ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
-  geom_bar(stat = &quot;identity&quot;, position = position_dodge())</code></pre>
+  geom_bar(stat = &quot;identity&quot;, position = position_dodge()) + 
+  coord_flip()</code></pre>
 <p><img src="data_source_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
 <pre class="r"><code>origin_df = read_csv(&quot;./data/LeagueofLegends.csv&quot;) %&gt;% janitor::clean_names()
 
@@ -562,6 +563,10 @@ merge_file &lt;- merge_file %&gt;%
   stat_smooth(method = &quot;glm&quot;, se = FALSE, fullrange = TRUE, 
               method.args = list(family = binomial))</code></pre>
 <p><img src="data_source_files/figure-html/unnamed-chunk-14-3.png" width="90%" /></p>
+</div>
+<div id="export-to-csv" class="section level2">
+<h2>export to csv</h2>
+<pre class="r"><code>write.csv(merge_file,&quot;./data/merge.csv&quot;, row.names = FALSE)</code></pre>
 </div>
 </div>
 

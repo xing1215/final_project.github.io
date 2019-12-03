@@ -12,7 +12,7 @@
 
 
 
-<title>league of legend prediction</title>
+<title>index.utf8.md</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -20,9 +20,6 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
-<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
-<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -253,63 +250,6 @@ $(document).ready(function () {
 
 
 
-<style type="text/css">
-
-#TOC {
-  margin: 25px 0px 20px 0px;
-}
-@media (max-width: 768px) {
-#TOC {
-  position: relative;
-  width: 100%;
-}
-}
-
-
-.toc-content {
-  padding-left: 30px;
-  padding-right: 40px;
-}
-
-div.main-container {
-  max-width: 1200px;
-}
-
-div.tocify {
-  width: 20%;
-  max-width: 260px;
-  max-height: 85%;
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  div.tocify {
-    width: 25%;
-  }
-}
-
-@media (max-width: 767px) {
-  div.tocify {
-    width: 100%;
-    max-width: none;
-  }
-}
-
-.tocify ul, .tocify li {
-  line-height: 20px;
-}
-
-.tocify-subheader .tocify-item {
-  font-size: 0.90em;
-}
-
-.tocify .list-group-item {
-  border-radius: 0px;
-}
-
-
-</style>
-
-
 
 </head>
 
@@ -317,16 +257,6 @@ div.tocify {
 
 
 <div class="container-fluid main-container">
-
-
-<!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row-fluid">
-<div class="col-xs-12 col-sm-4 col-md-3">
-<div id="TOC" class="tocify">
-</div>
-</div>
-
-<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -370,271 +300,14 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">league of legend prediction</h1>
 
 </div>
 
 
-<div id="data-cleaning" class="section level1">
-<h1>data cleaning</h1>
-<div id="read-the-leagueoflegends.csv" class="section level2">
-<h2>read the leagueoflegends.csv</h2>
-<pre class="r"><code>leagueoflegends = 
-  read_csv(file = &quot;./data/LeagueofLegends.csv&quot;) %&gt;% 
-  janitor::clean_names() %&gt;% 
-  mutate(address = str_remove(address, &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)) %&gt;% 
-  select(address, year, b_result)</code></pre>
-<pre><code>## Parsed with column specification:
-## cols(
-##   .default = col_character(),
-##   Year = col_double(),
-##   bResult = col_double(),
-##   rResult = col_double(),
-##   gamelength = col_double()
-## )</code></pre>
-<pre><code>## See spec(...) for full column specifications.</code></pre>
-</div>
-<div id="read-and-clean-the-tower-data" class="section level2">
-<h2>read and clean the tower data</h2>
-<pre class="r"><code>tower = 
-  read_csv(file = &quot;./data/structures.csv&quot;) %&gt;% 
-  janitor::clean_names() %&gt;% 
-  filter(type == &quot;OUTER_TURRET&quot;) %&gt;% 
-  mutate(
-    address = str_remove(address, &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)
-  )</code></pre>
-<pre><code>## Parsed with column specification:
-## cols(
-##   Address = col_character(),
-##   Team = col_character(),
-##   Time = col_double(),
-##   Lane = col_character(),
-##   Type = col_character()
-## )</code></pre>
-<p>calculate the mean time, group by match id</p>
-<pre class="r"><code>tower = 
-  tower %&gt;% 
-  group_by(address, team) %&gt;% 
-  mutate(
-    outer_tower = mean(time, na.rm = TRUE)
-  ) %&gt;% 
-  select(-lane, -time, -type) %&gt;%
-  distinct() %&gt;% 
-  pivot_wider(
-    names_from = team,
-    values_from = outer_tower
-  ) %&gt;% 
-  mutate(outer_mean_diff = bTowers - rTowers)</code></pre>
-<p>join with the leagueoflegend dataset</p>
-<pre class="r"><code>merge_file = 
-  left_join(leagueoflegends, tower, by = &quot;address&quot;) %&gt;% 
-  mutate(b_result = recode_factor(b_result, &quot;1&quot; = &quot;win&quot;, &quot;0&quot; = &quot;lose&quot;))</code></pre>
-<p>some visualizations</p>
-<pre class="r"><code>merge_file %&gt;% 
-  ggplot(aes(x = b_result, y = outer_mean_diff)) + 
-  geom_boxplot()</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
-<p>bTower means the mean time blue team destroy enemy’s outer towers among three lanes, rTower means the mean time red team destroy enemy’s outer towers among three lanes. We care about the impact of different of mean time between two groups. from the plot, we can see that if bTower is smaller than rTower (meaning that blue teams destroy red teams’ outer tower faster) there will be a higher win rate among blue teams</p>
-</div>
-<div id="read-and-clean-the-gold-data" class="section level2">
-<h2>read and clean the gold data</h2>
-<pre class="r"><code>gold = 
-  read_csv(file = &quot;./data/gold.csv&quot;) %&gt;% 
-  janitor::clean_names() %&gt;% 
-  filter(type == &quot;golddiff&quot;) %&gt;% 
-  mutate(
-    address = str_remove(address, &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)
-  ) %&gt;% 
-  pivot_longer(
-    min_1:min_95,
-    names_to = &quot;min&quot;, 
-    names_prefix = &quot;min_&quot;,
-    values_to = &quot;gold&quot;
-  ) %&gt;% 
-  drop_na()</code></pre>
-<pre><code>## Parsed with column specification:
-## cols(
-##   .default = col_double(),
-##   Address = col_character(),
-##   Type = col_character(),
-##   min_69 = col_logical(),
-##   min_70 = col_logical(),
-##   min_71 = col_logical(),
-##   min_72 = col_logical(),
-##   min_73 = col_logical(),
-##   min_74 = col_logical(),
-##   min_75 = col_logical(),
-##   min_76 = col_logical(),
-##   min_77 = col_logical(),
-##   min_78 = col_logical(),
-##   min_79 = col_logical(),
-##   min_80 = col_logical(),
-##   min_81 = col_logical(),
-##   min_82 = col_logical(),
-##   min_83 = col_logical(),
-##   min_84 = col_logical(),
-##   min_85 = col_logical(),
-##   min_86 = col_logical()
-##   # ... with 9 more columns
-## )</code></pre>
-<pre><code>## See spec(...) for full column specifications.</code></pre>
-<pre class="r"><code>gold_ave =
-  gold %&gt;% 
-  group_by(address) %&gt;% 
-  summarize(
-    golddiff_mean = mean(gold)
-  )</code></pre>
-<p>combine</p>
-<pre class="r"><code>merge_file = left_join(merge_file, gold_ave, by = &quot;address&quot;)</code></pre>
-<p>Plot</p>
-<pre class="r"><code>merge_file %&gt;% 
-  ggplot(aes(x = b_result, y = golddiff_mean)) + 
-  geom_boxplot()</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
-</div>
-<div id="read-and-clean-the-neutral-kills-data" class="section level2">
-<h2>read and clean the neutral kills data</h2>
-<pre class="r"><code>monster = read_csv(&quot;./data/monsters.csv&quot;)</code></pre>
-<pre><code>## Parsed with column specification:
-## cols(
-##   Address = col_character(),
-##   Team = col_character(),
-##   Time = col_double(),
-##   Type = col_character()
-## )</code></pre>
-<pre class="r"><code>str(monster)</code></pre>
-<pre><code>## Classes &#39;spec_tbl_df&#39;, &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;: 44248 obs. of  4 variables:
-##  $ Address: chr  &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/30030?gameHash=fbb300951ad8327c&quot; &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/30054?gameHash=055b17da8456fdc8&quot; &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/30054?gameHash=055b17da8456fdc8&quot; &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/30054?gameHash=055b17da8456fdc8&quot; ...
-##  $ Team   : chr  &quot;bDragons&quot; &quot;bDragons&quot; &quot;bDragons&quot; &quot;bDragons&quot; ...
-##  $ Time   : num  37.3 32.5 26.2 19.1 24.6 ...
-##  $ Type   : chr  &quot;DRAGON&quot; &quot;DRAGON&quot; &quot;DRAGON&quot; &quot;DRAGON&quot; ...
-##  - attr(*, &quot;spec&quot;)=
-##   .. cols(
-##   ..   Address = col_character(),
-##   ..   Team = col_character(),
-##   ..   Time = col_double(),
-##   ..   Type = col_character()
-##   .. )</code></pre>
-<pre class="r"><code>summary(monster)</code></pre>
-<pre><code>##    Address              Team                Time            Type          
-##  Length:44248       Length:44248       Min.   : 3.082   Length:44248      
-##  Class :character   Class :character   1st Qu.:16.448   Class :character  
-##  Mode  :character   Mode  :character   Median :23.617   Mode  :character  
-##                                        Mean   :24.169                     
-##                                        3rd Qu.:30.842                     
-##                                        Max.   :92.364</code></pre>
-<pre class="r"><code>monster = 
-  monster %&gt;% 
-  filter(Team %in% c(&quot;bDragons&quot;, &quot;bBarons&quot;, &quot;bHeralds&quot;)) %&gt;% 
-  group_by(Address, Type) %&gt;% 
-  summarize(number = n()) %&gt;% 
-  pivot_wider(
-    names_from = Type,
-    values_from = number
-  ) 
-monster[is.na(monster)] = 0
-monster = monster %&gt;% 
-  janitor::clean_names()</code></pre>
-<p>merge</p>
-<pre class="r"><code>merge_file = left_join(merge_file, monster, by = &quot;address&quot;)</code></pre>
-<p>visualizations</p>
-<pre class="r"><code>origin_df = read_csv(&quot;./data/LeagueofLegends.csv&quot;) %&gt;% janitor::clean_names()</code></pre>
-<pre><code>## Parsed with column specification:
-## cols(
-##   .default = col_character(),
-##   Year = col_double(),
-##   bResult = col_double(),
-##   rResult = col_double(),
-##   gamelength = col_double()
-## )</code></pre>
-<pre><code>## See spec(...) for full column specifications.</code></pre>
-<pre class="r"><code>blank_theme &lt;- theme_minimal() +
-  theme(
-  axis.title.x = element_blank(),
-  axis.title.y = element_blank(),
-  panel.border = element_blank(),
-  panel.grid = element_blank(),
-  axis.ticks = element_blank(),
-  plot.title = element_text(size = 14, face = &quot;bold&quot;)
-  )
-origin_df %&gt;% 
-  select(b_result, r_result) %&gt;% 
-  mutate(b_wins = sum(b_result), r_wins = sum(r_result), total = b_wins + r_wins) %&gt;% 
-  select(b_wins:total) %&gt;%
-  pivot_longer(
-    b_wins:r_wins,
-    names_to = &quot;team&quot;,
-    values_to = &quot;game_won&quot;
-  ) %&gt;% 
-  filter(row_number() &lt;= 2) %&gt;% 
-  ggplot(aes(x = &quot;&quot;, y = game_won, fill = team)) +
-  geom_bar(stat = &quot;identity&quot;, width = 1) +
-  geom_text(aes(label = percent(game_won / total)), position = position_stack(vjust = 0.5)) +
-  coord_polar(&quot;y&quot;) +
-  labs(  
-    title = &quot;Win rates of Blue and Red teams across all years&quot;
-  ) +
-  scale_fill_manual(labels = c(&quot;Blue&quot;, &quot;Red&quot;), values = c(&quot;cadetblue1&quot;, &quot;coral1&quot;)) + 
-  blank_theme +
-  theme(axis.text.x = element_blank())</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
-</div>
-<div id="read-and-clean-the-kills-data" class="section level2">
-<h2>read and clean the kills data</h2>
-<pre class="r"><code>kills &lt;- read_csv(&quot;./data/kills.csv&quot;)</code></pre>
-<pre><code>## Parsed with column specification:
-## cols(
-##   Address = col_character(),
-##   Team = col_character(),
-##   Time = col_double(),
-##   Victim = col_character(),
-##   Killer = col_character(),
-##   Assist_1 = col_character(),
-##   Assist_2 = col_character(),
-##   Assist_3 = col_character(),
-##   Assist_4 = col_character(),
-##   x_pos = col_character(),
-##   y_pos = col_character()
-## )</code></pre>
-<pre class="r"><code>## set key
-key &lt;- pull(origin_df,address) %&gt;% as_tibble()
-## merged the kills.csv with key
-colnames(key) &lt;- &quot;address&quot;
-kills &lt;- kills %&gt;% janitor::clean_names()
-kills_all &lt;- left_join(key, kills, by = &quot;address&quot;)
-## calculate kill difference between blue team and red team
-kills_diff &lt;- kills_all %&gt;% 
-  group_by(address,team) %&gt;%
-  select(address,team) %&gt;% 
-  summarize(n = n()) %&gt;% 
-  pivot_wider(
-    names_from = &quot;team&quot;,
-    values_from = &quot;n&quot;) %&gt;%
-  mutate(diff = bKills - rKills)
-## extract bResult from dataset
-outcome &lt;- pull(origin_df,b_result) %&gt;% as_tibble()
-colnames(outcome) &lt;- &quot;bresult&quot;
-df &lt;- bind_cols(kills_diff,outcome)</code></pre>
-<p>do some visualization</p>
-<pre class="r"><code>df %&gt;% ggplot(aes(x = diff,y = bresult)) +
-  geom_point()</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-13-1.png" width="90%" /></p>
-<pre class="r"><code>df %&gt;%  ggplot((aes(x = bresult,y = diff,group = bresult))) +
-  geom_boxplot() +
-  coord_flip()</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-13-2.png" width="90%" /></p>
-<pre class="r"><code>df %&gt;% ggplot(aes(x = diff,y = bresult)) +
-  geom_point(alpha = 0.5) +
-  stat_smooth(method = &quot;glm&quot;, se = FALSE, fullrange = TRUE, 
-              method.args = list(family = binomial))</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-13-3.png" width="90%" /></p>
-</div>
-</div>
 
 
 
-</div>
-</div>
+
 
 </div>
 
@@ -667,32 +340,6 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = true;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

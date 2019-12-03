@@ -161,6 +161,20 @@ merge_file = left_join(merge_file, monster, by = "address")
 
 visualizations
 
+```{r}
+merge_file %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    baron_nashor:fire_dragon,
+    names_to = "neutral_monster",
+    values_to = "number"
+  ) %>% 
+  group_by(b_result, neutral_monster) %>% 
+  summarize(number = sum(number, na.rm = TRUE)) %>% 
+  ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
+  geom_bar(stat = "identity", position = position_dodge())
+```
+
 ```{r,message=FALSE, warning=FALSE}
 origin_df = read_csv("./data/LeagueofLegends.csv") %>% janitor::clean_names()
 

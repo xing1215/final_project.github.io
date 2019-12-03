@@ -16,5 +16,5 @@ The figure above shows the average gold difference across the whole game when bl
 
 ![](kills_diff.png)
 
-
+![](monster_diff.png)
 

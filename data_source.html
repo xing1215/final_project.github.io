@@ -486,6 +486,18 @@ monster[is.na(monster)] = 0</code></pre>
 <p>merge</p>
 <pre class="r"><code>merge_file = left_join(merge_file, monster, by = &quot;address&quot;)</code></pre>
 <p>visualizations</p>
+<pre class="r"><code>merge_file %&gt;% 
+  janitor::clean_names() %&gt;% 
+  pivot_longer(
+    baron_nashor:fire_dragon,
+    names_to = &quot;neutral_monster&quot;,
+    values_to = &quot;number&quot;
+  ) %&gt;% 
+  group_by(b_result, neutral_monster) %&gt;% 
+  summarize(number = sum(number, na.rm = TRUE)) %&gt;% 
+  ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
+  geom_bar(stat = &quot;identity&quot;, position = position_dodge())</code></pre>
+<p><img src="data_source_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
 <pre class="r"><code>origin_df = read_csv(&quot;./data/LeagueofLegends.csv&quot;) %&gt;% janitor::clean_names()
 
 blank_theme &lt;- theme_minimal() +
@@ -517,7 +529,7 @@ origin_df %&gt;%
   scale_fill_manual(labels = c(&quot;Blue&quot;, &quot;Red&quot;), values = c(&quot;cadetblue1&quot;, &quot;coral1&quot;)) + 
   blank_theme +
   theme(axis.text.x = element_blank())</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
+<p><img src="data_source_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
 </div>
 <div id="read-and-clean-the-kills-data" class="section level2">
 <h2>read and clean the kills data</h2>
@@ -540,16 +552,16 @@ merge_file &lt;- merge_file %&gt;%
 <p>do some visualization</p>
 <pre class="r"><code>merge_file %&gt;% ggplot(aes(x = diff,y = b_result)) + 
   geom_point()</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-13-1.png" width="90%" /></p>
+<p><img src="data_source_files/figure-html/unnamed-chunk-14-1.png" width="90%" /></p>
 <pre class="r"><code>merge_file %&gt;%  ggplot((aes(x = b_result,y = diff,group = b_result))) +
   geom_boxplot() +
   coord_flip()</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-13-2.png" width="90%" /></p>
+<p><img src="data_source_files/figure-html/unnamed-chunk-14-2.png" width="90%" /></p>
 <pre class="r"><code>merge_file %&gt;% ggplot(aes(x = diff,y = b_result)) + 
   geom_point(alpha = 0.5) +
   stat_smooth(method = &quot;glm&quot;, se = FALSE, fullrange = TRUE, 
               method.args = list(family = binomial))</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-13-3.png" width="90%" /></p>
+<p><img src="data_source_files/figure-html/unnamed-chunk-14-3.png" width="90%" /></p>
 </div>
 </div>
 

@@ -26,15 +26,28 @@ We used [League of Legends competitive matches dataset](https://www.kaggle.com/c
 
 ## Important Indicators and Explanations
 * **Kills**
+<<<<<<< HEAD
+=======
+
+>>>>>>> a5d229b82bb167a8478cff0a59b19e1fb3d3441b
 Killing is a very important player behavior in League of Legends games. To be more specific, the killing can be interpreted as your controlled player, called champion in this game, kills enemy's champion or is killed by enemy's. It just like the Pokémon you used in the Pokémon game, which is defeated by the opponent's Pokémon. Killing has a huge potential impact on the progress of the game. On the one hand, killing behavior will bring money to your team, so that you have more money to buy powerful equipments to make your champions stronger. On the other hand, killed enemy's champions will enter resurrection time and they will not be able to act during resurrection time.
 
 * **Tower**
+
 The way to win the League of Legends game is to destroy the opponent's "Nexus base". However, before reaching the "Nexus base", your team should take down towers in order to reveal the "Nexus base". "Nexus base" cannot be attacked before some of the towers have fallen. Also, destroying the tower can bring more money and map control to your side, which is crucial to the win.
 
 * **Monsters**
+<<<<<<< HEAD
 There are many neutral monsters in the game map. After killing certain monsters, you will get both monetary rewards and additional special effect gains, called buff in the game. Dragon (with 5 different types), Rift Herald and Baron Nashor are the three of the most important monsters. 
 
 * **Glods**
+=======
+
+There are many neutral monsters in the game map. After killing certain monsters, you will get both monetary rewards and additional special effect gains, called buff in the game. Dragon (with 5 different types), Rift Herald and Baron Nashor are the three of the most important monsters.
+
+* **Glods**
+
+>>>>>>> a5d229b82bb167a8478cff0a59b19e1fb3d3441b
 Glod is the name of money in the game. It enables players to buy powerful equipments for champions they controlled. There are many ways to earn Glod in the game, such as the ones mentioned above: killing, taking down towers and killing netural monsters. A gold lead will give your team a huge game advantage, which will drive your team to victory.
 
 # Methods

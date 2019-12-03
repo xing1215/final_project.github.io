@@ -486,7 +486,8 @@ monster[is.na(monster)] = 0</code></pre>
 <p>merge</p>
 <pre class="r"><code>merge_file = left_join(merge_file, monster, by = &quot;address&quot;)</code></pre>
 <p>visualizations</p>
-<pre class="r"><code>merge_file %&gt;% 
+<pre class="r"><code>plot_only = 
+  merge_file %&gt;% 
   janitor::clean_names() %&gt;% 
   pivot_longer(
     baron_nashor:fire_dragon,
@@ -498,7 +499,6 @@ monster[is.na(monster)] = 0</code></pre>
   ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
   geom_bar(stat = &quot;identity&quot;, position = position_dodge()) + 
   coord_flip()</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
 <pre class="r"><code>origin_df = read_csv(&quot;./data/LeagueofLegends.csv&quot;) %&gt;% janitor::clean_names()
 
 blank_theme &lt;- theme_minimal() +

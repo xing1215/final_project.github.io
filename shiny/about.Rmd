@@ -13,17 +13,40 @@ library(readr)
 library(tidyverse)
 library(viridis)
 library(plotly)
+library(scales)
+library(ggridges)
+library(patchwork)
 ```
 
 
 ```{r}
 merge = 
   read_csv(file = "./data/merge.csv") %>% 
-  janitor::clean_names()
+  janitor::clean_names() %>% 
+  mutate(
+    year = recode_factor(year, "2014" = "S4", "2015" = "S5", "2016" = "S6", "2017" = "S7", "2018" = "S8"), 
+    year = fct_relevel(year, "S4", "S5", "S6", "S7", "S8")
+  )
 
 origin_df = 
   read_csv("./data/LeagueofLegends.csv") %>% 
-  janitor::clean_names()
+  janitor::clean_names() %>% 
+  mutate(
+    year = recode_factor(year, "2014" = "S4", "2015" = "S5", "2016" = "S6", "2017" = "S7", "2018" = "S8"), 
+    year = fct_relevel(year, "S4", "S5", "S6", "S7", "S8")
+  )
+
+blank_theme <- theme_minimal() +
+  theme(
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  panel.border = element_blank(),
+  panel.grid = element_blank(),
+  axis.ticks = element_blank(),
+  plot.title = element_text(size = 14, face = "bold")
+)
+
+# rsconnect::deployApp('/Users/xingchen/Desktop/Data Science/final_project/final_project.github.io/shiny')
 ```
 
 
@@ -34,10 +57,7 @@ Column {.sidebar}
 year = 
   origin_df %>% 
   distinct(year) %>% 
-  mutate(
-    year = recode_factor(year, "2014" = "S4", "2015" = "S5", "2016" = "S6", "2017" = "S7", "2018" = "S8"), 
-    year = fct_relevel(year, "S4", "S5", "S6", "S7", "S8")
-  ) %>% pull()
+  pull()
 
 # selectInput widget, something like a dropdown menu
 
@@ -55,7 +75,17 @@ Column {data-width=650}
 ### Chart A
 
 ```{r}
-
+renderPlotly({
+  merge %>% 
+    filter(year == input[["year_choice"]]) %>% 
+    ggplot(aes(x = b_result, y = outer_mean_diff)) + 
+    geom_boxplot() +
+    labs(
+      title = "Fig1: time length of destroying enemy's towers vs. battle reuslts", 
+      x = "results of blue team",
+      y = "mean time difference of destroying towers"
+    )
+})
 ```
 
 Column {data-width=350}

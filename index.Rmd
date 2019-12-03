@@ -2,7 +2,6 @@
 title: "league of legend prediction"
 output: 
   html_document:
-    code_folding: hide
     toc: true
     toc_float: true
 ---
@@ -101,10 +100,11 @@ gold =
     address = str_remove(address, "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")
   ) %>% 
   pivot_longer(
-  min_1:min_95,
-  names_to = "min", 
-  names_prefix = "min_",
-  values_to = "gold") %>% 
+    min_1:min_95,
+    names_to = "min", 
+    names_prefix = "min_",
+    values_to = "gold"
+  ) %>% 
   drop_na()
 
 gold_ave =
@@ -118,18 +118,13 @@ gold_ave =
 combine
 
 ```{r}
-gold_mg = 
-  leagueoflegends %>% 
-  mutate(address = str_remove(address, "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
-  select(address, b_result) %>% 
-  left_join(leagueoflegends, gold_ave, by = "address") %>% 
-  mutate(b_result = recode_factor(b_result, "1" = "win", "0" = "lose"))
+merge_file = left_join(merge_file, gold_ave, by = "address")
 ```
 
 Plot
 
 ```{r}
-gold_mg %>% 
+merge_file %>% 
   ggplot(aes(x = b_result, y = golddiff_mean)) + 
   geom_boxplot()
 ```

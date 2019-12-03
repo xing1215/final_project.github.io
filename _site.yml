@@ -9,6 +9,8 @@ navbar:
       href: data_source.html
   
   right:
+    - icon: fas fa-chart-line fa-lg
+      href: visualization.html
     - icon: fa-github fa-lg
       href: https://github.com/xing1215/final_project.github.io
 

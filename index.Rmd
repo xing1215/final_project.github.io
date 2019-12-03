@@ -21,10 +21,13 @@ League of Legends (LoL) is an immensely popular multiplayer online battle arena 
 All of our team members love League of Legends so much and this game has become an integral part of our lives. We really enjoy winning the game, but we are not always win. We know the taste of failure very well. So we are very curious about the deteminants of winning the game, other than personal technologies and team cooperation with these unmeasurable data.
 
 # Data
+
 * **League of Legends match data**
+
 We used [League of Legends competitive matches dataset](https://www.kaggle.com/chuckephron/leagueoflegends) to obtain matches data between 2015 to 2018 from [kaggle](https://www.kaggle.com/), a data modeling and data analysis competition platform. 
 
 ## Important Indicators and Explanations
+
 * **Kills**
 
 Killing is a very important player behavior in League of Legends games. To be more specific, the killing can be interpreted as your controlled player, called champion in this game, kills enemy's champion or is killed by enemy's. It just like the Pokémon you used in the Pokémon game, which is defeated by the opponent's Pokémon. Killing has a huge potential impact on the progress of the game. On the one hand, killing behavior will bring money to your team, so that you have more money to buy powerful equipments to make your champions stronger. On the other hand, killed enemy's champions will enter resurrection time and they will not be able to act during resurrection time.

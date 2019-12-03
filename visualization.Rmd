@@ -8,13 +8,15 @@ output:
 
 ![](outer_mean_diff.png)
 
-Variable outer_mean_diff represents the difference of average time destroying the enemy's three outer towes between blue and red team (i.e. outer_mean_diff = average time blue team used - average time red team used). And vairable b_result, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expect that the blue team has a greater chance to win the game when the difference is negative, meaning the blue team takes less average time to destory the red team's outer towers.
+Variable outer_mean_diff represents the difference of average time destroying the enemy's three outer towers between blue and red team (i.e. outer_mean_diff = average time blue team used - average time red team used). And vairable b_result, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expect that the blue team has a greater chance to win the game when the difference is negative, meaning the blue team takes less average time to destory the red team's outer towers.
 
 ![](gold_diff.png)
 
 Variable golddiff_mean represents the average monetary difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has more golds in average.
 
 ![](kills_diff.png)
+
+Variable 
 
 ![](monster_diff.png)
 

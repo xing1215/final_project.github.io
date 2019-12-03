@@ -86,10 +86,13 @@ some visualizations
 ```{r,message=FALSE, warning=FALSE}
 merge_file %>% 
   ggplot(aes(x = b_result, y = outer_mean_diff)) + 
-  geom_boxplot()
+  geom_boxplot() +
+  labs(
+    title = "time length of destroying enemy's towers vs. battle reuslts", 
+    x = "results of blue team",
+    y = "mean time difference of destroying towers"
+  )
 ```
-
-bTower means the mean time blue team destroy enemy's outer towers among three lanes, rTower means the mean time red team destroy enemy's outer towers among three lanes. We care about the impact of different of mean time between two groups. from the plot, we can see that if bTower is smaller than rTower (meaning that blue teams destroy red teams' outer tower faster) there will be a higher win rate among blue teams
 
 
 ## read and clean the gold data
@@ -127,10 +130,13 @@ merge_file = left_join(merge_file, gold_ave, by = "address")
 ```{r,message=FALSE, warning=FALSE}
 merge_file %>% 
   ggplot(aes(x = b_result, y = golddiff_mean)) + 
-  geom_boxplot()
+  geom_boxplot() +
+  labs(
+    title = "total golds difference vs. battle results",
+    x = "results of blue team", 
+    y = "mean gold difference"
+  )
 ```
-
-The figure above shows the average gold difference across the whole game when blue team wins and blue team loses. The gold difference is calculated by the total gold of blue team minus that of red team in every minutes of the game. As we expected, the average mean of gold difference should be higher when blue team wins the game. 
 
 
 ## read and clean the neutral kills data

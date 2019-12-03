@@ -429,9 +429,13 @@ div.tocify {
 <p>some visualizations</p>
 <pre class="r"><code>merge_file %&gt;% 
   ggplot(aes(x = b_result, y = outer_mean_diff)) + 
-  geom_boxplot()</code></pre>
+  geom_boxplot() +
+  labs(
+    title = &quot;time length of destroying enemy&#39;s towers vs. battle reuslts&quot;, 
+    x = &quot;results of blue team&quot;,
+    y = &quot;mean time difference of destroying towers&quot;
+  )</code></pre>
 <p><img src="data_source_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
-<p>bTower means the mean time blue team destroy enemy’s outer towers among three lanes, rTower means the mean time red team destroy enemy’s outer towers among three lanes. We care about the impact of different of mean time between two groups. from the plot, we can see that if bTower is smaller than rTower (meaning that blue teams destroy red teams’ outer tower faster) there will be a higher win rate among blue teams</p>
 </div>
 <div id="read-and-clean-the-gold-data" class="section level2">
 <h2>read and clean the gold data</h2>
@@ -460,9 +464,13 @@ gold_ave =
 <pre class="r"><code>merge_file = left_join(merge_file, gold_ave, by = &quot;address&quot;)</code></pre>
 <pre class="r"><code>merge_file %&gt;% 
   ggplot(aes(x = b_result, y = golddiff_mean)) + 
-  geom_boxplot()</code></pre>
+  geom_boxplot() +
+  labs(
+    title = &quot;total golds difference vs. battle results&quot;,
+    x = &quot;results of blue team&quot;, 
+    y = &quot;mean gold difference&quot;
+  )</code></pre>
 <p><img src="data_source_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
-<p>The figure above shows the average gold difference across the whole game when blue team wins and blue team loses. The gold difference is calculated by the total gold of blue team minus that of red team in every minutes of the game. As we expected, the average mean of gold difference should be higher when blue team wins the game.</p>
 </div>
 <div id="read-and-clean-the-neutral-kills-data" class="section level2">
 <h2>read and clean the neutral kills data</h2>

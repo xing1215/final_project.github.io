@@ -198,15 +198,10 @@ origin_df %>%
 ## read and clean the kills data
 
 ```{r,message=FALSE, warning=FALSE}
-kills <- read_csv("./data/kills.csv")
-## set key
-key <- pull(origin_df,address) %>% as_tibble()
-## merged the kills.csv with key
-colnames(key) <- "address"
-kills <- kills %>% janitor::clean_names()
-kills_all <- left_join(key, kills, by = "address")
-## calculate kill difference between blue team and red team
-kills_diff <- kills_all %>% 
+kills <- read_csv("./data/kills.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(address = str_remove(address,
+        "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>%         
   group_by(address,team) %>%
   select(address,team) %>% 
   summarize(n = n()) %>% 
@@ -214,21 +209,23 @@ kills_diff <- kills_all %>%
     names_from = "team",
     values_from = "n") %>%
   mutate(diff = bKills - rKills)
-## extract bResult from dataset
-outcome <- pull(origin_df,b_result) %>% as_tibble()
-colnames(outcome) <- "bresult"
-df <- bind_cols(kills_diff,outcome)
+## merge kills to merge_file.csv
+merge_file <- left_join(merge_file,kills,by="address")
+## relevel b_results
+merge_file <- merge_file %>% 
+  mutate(b_result = relevel(b_result,"lose"))
+
 ```
 
 do some visualization
 
 ```{r,message=FALSE, warning=FALSE}
-df %>% ggplot(aes(x = diff,y = bresult)) + 
+merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point()
-df %>%  ggplot((aes(x = bresult,y = diff,group = bresult))) +
+merge_file %>%  ggplot((aes(x = b_result,y = diff,group = b_result))) +
   geom_boxplot() +
   coord_flip()
-df %>% ggplot(aes(x = diff,y = bresult)) + 
+merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point(alpha = 0.5) +
   stat_smooth(method = "glm", se = FALSE, fullrange = TRUE, 
               method.args = list(family = binomial))

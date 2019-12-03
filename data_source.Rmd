@@ -2,6 +2,7 @@
 title: "data source"
 output: 
   html_document:
+    code_folding: hide
     toc: true
     toc_float: true
 ---
@@ -31,7 +32,7 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 ## read the leagueoflegends.csv
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 leagueoflegends = 
   read_csv(file = "./data/LeagueofLegends.csv") %>% 
   janitor::clean_names() %>% 
@@ -42,7 +43,7 @@ leagueoflegends =
 
 ## read and clean the tower data
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 tower = 
   read_csv(file = "./data/structures.csv") %>% 
   janitor::clean_names() %>% 
@@ -54,7 +55,7 @@ tower =
 
 calculate the mean time, group by match id
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 tower = 
   tower %>% 
   group_by(address, team) %>% 
@@ -72,7 +73,7 @@ tower =
 
 join with the leagueoflegend dataset
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 merge_file = 
   left_join(leagueoflegends, tower, by = "address") %>% 
   mutate(b_result = recode_factor(b_result, "1" = "win", "0" = "lose"))
@@ -80,7 +81,7 @@ merge_file =
 
 some visualizations
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 merge_file %>% 
   ggplot(aes(x = b_result, y = outer_mean_diff)) + 
   geom_boxplot()
@@ -91,7 +92,7 @@ bTower means the mean time blue team destroy enemy's outer towers among three la
 
 ## read and clean the gold data
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 gold = 
   read_csv(file = "./data/gold.csv") %>% 
   janitor::clean_names() %>% 
@@ -117,13 +118,13 @@ gold_ave =
 
 combine
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 merge_file = left_join(merge_file, gold_ave, by = "address")
 ```
 
 Plot
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 merge_file %>% 
   ggplot(aes(x = b_result, y = golddiff_mean)) + 
   geom_boxplot()
@@ -132,7 +133,7 @@ merge_file %>%
 
 ## read and clean the neutral kills data
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 monster = read_csv("./data/monsters.csv")
 str(monster)
 summary(monster)
@@ -153,13 +154,13 @@ monster = monster %>%
 
 merge
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 merge_file = left_join(merge_file, monster, by = "address")
 ```
 
 visualizations
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 origin_df = read_csv("./data/LeagueofLegends.csv") %>% janitor::clean_names()
 
 blank_theme <- theme_minimal() +
@@ -196,7 +197,7 @@ origin_df %>%
 
 ## read and clean the kills data
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 kills <- read_csv("./data/kills.csv")
 ## set key
 key <- pull(origin_df,address) %>% as_tibble()
@@ -221,7 +222,7 @@ df <- bind_cols(kills_diff,outcome)
 
 do some visualization
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 df %>% ggplot(aes(x = diff,y = bresult)) +
   geom_point()
 df %>%  ggplot((aes(x = bresult,y = diff,group = bresult))) +

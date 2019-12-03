@@ -24,6 +24,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
@@ -250,6 +251,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -377,6 +381,14 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore">League of Legends</h1>
@@ -384,23 +396,54 @@ div.tocify {
 </div>
 
 
-<div id="fig-1" class="section level2">
-<h2>Fig 1</h2>
-<p><img src="outer_mean_diff.png" /></p>
+<pre class="r"><code>library(tidyverse)
+library(readr)
+library(scales)
+library(ggridges)
+library(patchwork)
+
+knitr::opts_chunk$set(
+    echo = TRUE,
+    warning = FALSE,
+    fig.width = 8, 
+  fig.height = 6,
+  out.width = &quot;90%&quot;
+)
+options(
+  ggplot2.continuous.colour = &quot;viridis&quot;,
+  ggplot2.continuous.fill = &quot;viridis&quot;
+)
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))</code></pre>
+<div id="fig-1-destroy-towers" class="section level2">
+<h2>Fig 1: Destroy Towers</h2>
+<pre class="r"><code>merge_file = 
+  read_csv(file = &quot;./data/merge.csv&quot;)
+
+merge_file %&gt;% 
+  ggplot(aes(x = b_result, y = outer_mean_diff)) + 
+  geom_boxplot() +
+  labs(
+    title = &quot;Fig1: Time Length of Destroying Enemy&#39;s Towers vs. Battle Reuslts&quot;, 
+    x = &quot;Results of Blue Team&quot;,
+    y = &quot;Mean Time Difference of Destroying Towers&quot;
+  )</code></pre>
+<p><img src="visualization_files/figure-html/unnamed-chunk-2-1.png" width="90%" /></p>
 <p>Variable outer_mean_diff represents the difference of average time destroying the enemy’s three outer towers between blue and red team (i.e. outer_mean_diff = average time blue team used - average time red team used). And vairable b_result, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expect that the blue team has a greater chance to win the game when the difference is negative, meaning the blue team takes less average time to destory the red team’s outer towers.</p>
 </div>
-<div id="fig-2" class="section level2">
-<h2>Fig 2</h2>
+<div id="fig-2-team-economic-differences" class="section level2">
+<h2>Fig 2 Team Economic Differences</h2>
 <p><img src="gold_diff.png" /></p>
 <p>Variable golddiff_mean represents the average monetary difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has more golds in average.</p>
 </div>
-<div id="fig-3" class="section level2">
-<h2>Fig 3</h2>
+<div id="fig-3-neutrals-eliminated" class="section level2">
+<h2>Fig 3 Neutrals Eliminated</h2>
 <p><img src="monster_diff.png" /></p>
 <p>In this figure, we try to explore which neutral monsters have a higher effects in contributing to the battle results. The largest difference exists in the kills of baron_nashor.</p>
 </div>
-<div id="fig-4" class="section level2">
-<h2>Fig 4</h2>
+<div id="fig-4-team-kills-differences" class="section level2">
+<h2>Fig 4 Team Kills Differences</h2>
 <p><img src="kills_diff.png" /></p>
 </div>
 
@@ -439,6 +482,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 <script>
 $(document).ready(function ()  {

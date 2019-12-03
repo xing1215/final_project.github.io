@@ -4,27 +4,64 @@ output:
   html_document:
     toc: true
     toc_float: true
+    code_folding: hide
 ---
 
-## Fig 1
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(readr)
+library(scales)
+library(ggridges)
+library(patchwork)
 
-![](outer_mean_diff.png)
+knitr::opts_chunk$set(
+	echo = TRUE,
+	warning = FALSE,
+	fig.width = 8, 
+  fig.height = 6,
+  out.width = "90%"
+)
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+```
+
+## Fig 1: Destroy Towers
+
+```{r, message=FALSE, warning=FALSE}
+merge_file = 
+  read_csv(file = "./data/merge.csv")
+
+merge_file %>% 
+  ggplot(aes(x = b_result, y = outer_mean_diff)) + 
+  geom_boxplot() +
+  labs(
+    title = "Fig1: Time Length of Destroying Enemy's Towers vs. Battle Reuslts", 
+    x = "Results of Blue Team",
+    y = "Mean Time Difference of Destroying Towers"
+  )
+```
+
 
 Variable outer_mean_diff represents the difference of average time destroying the enemy's three outer towers between blue and red team (i.e. outer_mean_diff = average time blue team used - average time red team used). And vairable b_result, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expect that the blue team has a greater chance to win the game when the difference is negative, meaning the blue team takes less average time to destory the red team's outer towers.
 
-## Fig 2
+## Fig 2 Team Economic Differences
 
 ![](gold_diff.png)
 
 Variable golddiff_mean represents the average monetary difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has more golds in average.
 
-## Fig 3
+## Fig 3 Neutrals Eliminated
 
 ![](monster_diff.png)
 
 In this figure, we try to explore which neutral monsters have a higher effects in contributing to the battle results. The largest difference exists in the kills of baron_nashor. 
 
-## Fig 4
+## Fig 4 Team Kills Differences
 
 ![](kills_diff.png)
 

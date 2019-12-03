@@ -122,13 +122,13 @@ combine
 merge_file = left_join(merge_file, gold_ave, by = "address")
 ```
 
-Plot
-
 ```{r,message=FALSE, warning=FALSE}
 merge_file %>% 
   ggplot(aes(x = b_result, y = golddiff_mean)) + 
   geom_boxplot()
 ```
+
+The figure above shows the average gold difference across the whole game when blue team wins and blue team loses. The gold difference is calculated by the total gold of blue team minus that of red team in every minutes of the game. As we expected, the average mean of gold difference should be higher when blue team wins the game. 
 
 
 ## read and clean the neutral kills data

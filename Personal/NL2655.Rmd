@@ -50,8 +50,23 @@ mult_log %>%
 ```
 
 ```{r}
-my_data = mtcars[merge_file, c(3,4)]
-mcor = round(cor(merge_file),3)
-mcor
+tow_log = merge_file %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ outer_mean_diff, family = "binomial")
+ 
+tow_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+
+```{r}
+tow_gold_log = merge_file %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ outer_mean_diff + golddiff_mean, family = "binomial")
+ 
+tow_gold_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
 ```
 

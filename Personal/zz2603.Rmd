@@ -1,0 +1,123 @@
+---
+title: "zz2603"
+author: "Ziyi Zhao"
+date: "12/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+
+```
+
+# Win rate for each hero across years
+
+```{r, fig.width=20,fig.height=18}
+matchinfo = read_csv("./data/matchinfo.csv") %>% 
+  janitor::clean_names()
+
+bchamp = matchinfo %>% 
+  select(address,year,b_result,blue_top_champ,blue_jungle_champ,
+         blue_middle_champ,blue_adc_champ,blue_support_champ) %>%
+  mutate(address = str_remove(address,
+        "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
+  pivot_longer(blue_top_champ:blue_support_champ,
+               names_to = "champ_position",
+               values_to = "champ_name")
+  
+bchamp %>% filter(year==2015,champ_position=="blue_top_champ") %>% 
+  mutate(hero_name = as.factor(champ_name)) %>% 
+  group_by(hero_name) %>% 
+  mutate(total=n()) %>% 
+  filter(b_result==1) %>% 
+  mutate(nwin=n(),
+         win_rate = nwin/total) %>% 
+  ungroup(hero_name) %>% 
+  mutate(
+    hero_name = forcats::fct_reorder(hero_name,win_rate,.desc=FALSE)) %>% 
+  ggplot(aes(x=hero_name,y=win_rate,fill=hero_name))+
+  geom_bar(stat="identity")+
+  theme(axis.text.x = element_text(angle = 90,hjust=1),
+        axis.title = element_text(size = 25,face = "bold"),
+        axis.text = element_text(size=15),
+        plot.title = element_text(size=26,face = "bold"))+
+  coord_flip()+
+  viridis::scale_fill_viridis(discrete = TRUE)
+
+```
+
+# Every Hero Pick Rate across years
+
+```{r}
+allchamp = matchinfo %>% 
+  select(address,year,blue_top_champ,blue_middle_champ,blue_jungle_champ,
+         blue_adc_champ,blue_support_champ,red_top_champ,red_middle_champ,
+         red_jungle_champ,red_adc_champ,red_support_champ) %>% 
+  mutate(address = str_remove(address,
+        "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
+  pivot_longer(blue_top_champ:red_support_champ,
+               names_to = "champ_position",
+               values_to = "champ_name")
+
+allchamp %>% filter(year==2015,champ_position=="blue_top_champ") %>% 
+  mutate(champ_name = factor(champ_name),
+         totalgame = dim(.)[1]) %>% 
+  group_by(champ_name) %>% 
+  mutate(totalpick = n(),
+         pickrate = totalpick/totalgame) %>% 
+  ungroup(champ_name) %>% 
+  mutate(champ_name = forcats::fct_reorder(champ_name,pickrate)) %>% 
+  ggplot(aes(x=champ_name,y=pickrate,fill=champ_name))+
+  geom_bar(stat = "identity")+
+  theme(axis.text.x = element_text(angle = 90,hjust=1),
+        axis.text = element_text(size=5))+
+  coord_flip()+
+  viridis::scale_fill_viridis(discrete = TRUE)
+
+```
+
+# The rate of Hero being banned across years
+
+```{r, fig.height=20,fig.width=25}
+bans = read_csv("./data/bans.csv") %>% janitor::clean_names() %>% 
+  mutate(address = str_remove(address, 
+        "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
+  pivot_longer(ban_1:ban_5,
+               names_to = "bannumber",
+               values_to = "champ_name") %>% 
+  drop_na(champ_name)
+
+year = merge_file %>% select(address,year)
+
+bans = left_join(bans,year,by = "address")
+
+bans %>% filter(year==2015,team=="blueBans") %>% 
+  mutate(champ_name = factor(champ_name),
+         totalgame = dim(.)[1]) %>% 
+  group_by(champ_name) %>% 
+  mutate(totalban = n(),
+         banrate = totalban / totalgame) %>% 
+  ungroup(champ_name) %>% 
+  mutate(champ_name = forcats::fct_reorder(champ_name,banrate)) %>% 
+  ggplot(aes(x=champ_name,y=banrate,fill=champ_name))+
+  geom_bar(stat = "identity")+
+  theme(axis.text.x = element_text(angle = 90,hjust=1),
+        axis.text = element_text(size=15))+
+  coord_flip()+
+  viridis::scale_fill_viridis(discrete = TRUE)
+  
+
+
+
+
+
+
+```
+
+
+
+
+
+

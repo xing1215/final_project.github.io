@@ -11,7 +11,7 @@ navbar:
     - text: "Hero"
       href: .html
     - text: "Report"
-      href: data_source.html
+      href: report.html
     - icon: fas fa-gamepad fa-lg
       href: https://play.na.leagueoflegends.com/en_US
     - icon: fa-github fa-lg

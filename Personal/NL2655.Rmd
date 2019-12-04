@@ -83,3 +83,80 @@ plot_log %>%
   knitr::kable(digits = 3)
 ```
 
+##corr
+
+```{r}
+library(ggpubr)
+library("Hmisc")
+
+my_data =
+  merge_file %>% 
+  filter(year != 2014) %>% 
+  #select(-address, -year, -b_result, -bKills, -rKills, -bTowers, -rTowers) %>% #
+  select(outer_mean_diff, golddiff_mean, kill_diff, BARON_NASHOR, AIR_DRAGON, FIRE_DRAGON) %>%
+  rename(
+    tower = "outer_mean_diff",
+    gold = "golddiff_mean",
+    kill ="kill_diff",
+    nashor = "BARON_NASHOR",
+    air = "AIR_DRAGON",
+    fire = "FIRE_DRAGON"
+  ) %>% 
+  drop_na()
+
+res <- cor(my_data)
+round(res, 3) %>% 
+  knitr::kable()
+```
+
+**Decript**
+Kill and gold  cor = 0.80,
+
+gold and nashor cor = 0.44,
+
+kill and nashor cor = 0.41,
+
+others cor around 0.1.
+
+```{r}
+adjust_log = merge_file %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ golddiff_mean + kill_diff + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON, family = "binomial")
+ 
+adjust_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+```{r}
+adjust_log = merge_file %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON, family = "binomial")
+ 
+adjust_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+
+```{r}
+corr_log = merge_file %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ outer_mean_diff + golddiff_mean * BARON_NASHOR * kill_diff + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON + outer_mean_diff:golddiff_mean, family = "binomial")
+ 
+corr_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+```{r}
+final_log = merge_file %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR, family = "binomial")
+ 
+final_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+

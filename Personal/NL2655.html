@@ -664,6 +664,494 @@ plot_log %&gt;%
 </tr>
 </tbody>
 </table>
+<p>##corr</p>
+<pre class="r"><code>library(ggpubr)</code></pre>
+<pre><code>## Loading required package: magrittr</code></pre>
+<pre><code>## 
+## Attaching package: &#39;magrittr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     set_names</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     extract</code></pre>
+<pre class="r"><code>library(&quot;Hmisc&quot;)</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## Loading required package: survival</code></pre>
+<pre><code>## Loading required package: Formula</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Hmisc&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     src, summarize</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     format.pval, units</code></pre>
+<pre class="r"><code>my_data =
+  merge_file %&gt;% 
+  filter(year != 2014) %&gt;% 
+  #select(-address, -year, -b_result, -bKills, -rKills, -bTowers, -rTowers) %&gt;% #
+  select(outer_mean_diff, golddiff_mean, kill_diff, BARON_NASHOR, AIR_DRAGON, FIRE_DRAGON) %&gt;%
+  rename(
+    tower = &quot;outer_mean_diff&quot;,
+    gold = &quot;golddiff_mean&quot;,
+    kill =&quot;kill_diff&quot;,
+    nashor = &quot;BARON_NASHOR&quot;,
+    air = &quot;AIR_DRAGON&quot;,
+    fire = &quot;FIRE_DRAGON&quot;
+  ) %&gt;% 
+  drop_na()
+
+res &lt;- cor(my_data)
+round(res, 3) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">tower</th>
+<th align="right">gold</th>
+<th align="right">kill</th>
+<th align="right">nashor</th>
+<th align="right">air</th>
+<th align="right">fire</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>tower</td>
+<td align="right">1.000</td>
+<td align="right">-0.374</td>
+<td align="right">-0.105</td>
+<td align="right">-0.040</td>
+<td align="right">-0.083</td>
+<td align="right">-0.024</td>
+</tr>
+<tr class="even">
+<td>gold</td>
+<td align="right">-0.374</td>
+<td align="right">1.000</td>
+<td align="right">0.789</td>
+<td align="right">0.454</td>
+<td align="right">0.155</td>
+<td align="right">0.117</td>
+</tr>
+<tr class="odd">
+<td>kill</td>
+<td align="right">-0.105</td>
+<td align="right">0.789</td>
+<td align="right">1.000</td>
+<td align="right">0.427</td>
+<td align="right">0.104</td>
+<td align="right">0.134</td>
+</tr>
+<tr class="even">
+<td>nashor</td>
+<td align="right">-0.040</td>
+<td align="right">0.454</td>
+<td align="right">0.427</td>
+<td align="right">1.000</td>
+<td align="right">0.116</td>
+<td align="right">0.079</td>
+</tr>
+<tr class="odd">
+<td>air</td>
+<td align="right">-0.083</td>
+<td align="right">0.155</td>
+<td align="right">0.104</td>
+<td align="right">0.116</td>
+<td align="right">1.000</td>
+<td align="right">0.043</td>
+</tr>
+<tr class="even">
+<td>fire</td>
+<td align="right">-0.024</td>
+<td align="right">0.117</td>
+<td align="right">0.134</td>
+<td align="right">0.079</td>
+<td align="right">0.043</td>
+<td align="right">1.000</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Decript</strong> Kill and gold cor = 0.80,</p>
+<p>gold and nashor cor = 0.44,</p>
+<p>kill and nashor cor = 0.41,</p>
+<p>others cor around 0.1.</p>
+<pre class="r"><code>adjust_log = merge_file %&gt;% 
+  mutate(b_result = factor(b_result)) %&gt;% 
+  glm(formula =  b_result ~ golddiff_mean + kill_diff + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON, family = &quot;binomial&quot;)
+ 
+adjust_log %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.418</td>
+<td align="right">0.151</td>
+<td align="right">-9.408</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">golddiff_mean</td>
+<td align="right">0.007</td>
+<td align="right">0.003</td>
+<td align="right">2.192</td>
+<td align="right">0.028</td>
+</tr>
+<tr class="odd">
+<td align="left">kill_diff</td>
+<td align="right">0.467</td>
+<td align="right">0.016</td>
+<td align="right">28.924</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">BARON_NASHOR</td>
+<td align="right">1.053</td>
+<td align="right">0.086</td>
+<td align="right">12.280</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">DRAGON</td>
+<td align="right">0.311</td>
+<td align="right">0.058</td>
+<td align="right">5.332</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">AIR_DRAGON</td>
+<td align="right">0.614</td>
+<td align="right">0.130</td>
+<td align="right">4.732</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">EARTH_DRAGON</td>
+<td align="right">0.208</td>
+<td align="right">0.111</td>
+<td align="right">1.872</td>
+<td align="right">0.061</td>
+</tr>
+<tr class="even">
+<td align="left">WATER_DRAGON</td>
+<td align="right">0.261</td>
+<td align="right">0.112</td>
+<td align="right">2.332</td>
+<td align="right">0.020</td>
+</tr>
+<tr class="odd">
+<td align="left">FIRE_DRAGON</td>
+<td align="right">0.434</td>
+<td align="right">0.116</td>
+<td align="right">3.756</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>adjust_log = merge_file %&gt;% 
+  mutate(b_result = factor(b_result)) %&gt;% 
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON, family = &quot;binomial&quot;)
+ 
+adjust_log %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.237</td>
+<td align="right">0.095</td>
+<td align="right">-13.082</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">golddiff_mean</td>
+<td align="right">0.075</td>
+<td align="right">0.002</td>
+<td align="right">34.432</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">BARON_NASHOR</td>
+<td align="right">1.192</td>
+<td align="right">0.064</td>
+<td align="right">18.715</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">DRAGON</td>
+<td align="right">0.299</td>
+<td align="right">0.040</td>
+<td align="right">7.400</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">AIR_DRAGON</td>
+<td align="right">0.288</td>
+<td align="right">0.085</td>
+<td align="right">3.375</td>
+<td align="right">0.001</td>
+</tr>
+<tr class="even">
+<td align="left">EARTH_DRAGON</td>
+<td align="right">0.152</td>
+<td align="right">0.077</td>
+<td align="right">1.980</td>
+<td align="right">0.048</td>
+</tr>
+<tr class="odd">
+<td align="left">WATER_DRAGON</td>
+<td align="right">0.203</td>
+<td align="right">0.078</td>
+<td align="right">2.615</td>
+<td align="right">0.009</td>
+</tr>
+<tr class="even">
+<td align="left">FIRE_DRAGON</td>
+<td align="right">0.606</td>
+<td align="right">0.079</td>
+<td align="right">7.661</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>corr_log = merge_file %&gt;% 
+  mutate(b_result = factor(b_result)) %&gt;% 
+  glm(formula =  b_result ~ outer_mean_diff + golddiff_mean * BARON_NASHOR * kill_diff + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON + outer_mean_diff:golddiff_mean, family = &quot;binomial&quot;)
+ 
+corr_log %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.430</td>
+<td align="right">0.161</td>
+<td align="right">-8.891</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">outer_mean_diff</td>
+<td align="right">0.008</td>
+<td align="right">0.012</td>
+<td align="right">0.697</td>
+<td align="right">0.486</td>
+</tr>
+<tr class="odd">
+<td align="left">golddiff_mean</td>
+<td align="right">0.021</td>
+<td align="right">0.006</td>
+<td align="right">3.829</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">BARON_NASHOR</td>
+<td align="right">1.102</td>
+<td align="right">0.096</td>
+<td align="right">11.490</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">kill_diff</td>
+<td align="right">0.491</td>
+<td align="right">0.026</td>
+<td align="right">18.831</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">DRAGON</td>
+<td align="right">0.313</td>
+<td align="right">0.059</td>
+<td align="right">5.317</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">AIR_DRAGON</td>
+<td align="right">0.591</td>
+<td align="right">0.133</td>
+<td align="right">4.451</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">EARTH_DRAGON</td>
+<td align="right">0.218</td>
+<td align="right">0.113</td>
+<td align="right">1.937</td>
+<td align="right">0.053</td>
+</tr>
+<tr class="odd">
+<td align="left">WATER_DRAGON</td>
+<td align="right">0.268</td>
+<td align="right">0.114</td>
+<td align="right">2.356</td>
+<td align="right">0.018</td>
+</tr>
+<tr class="even">
+<td align="left">FIRE_DRAGON</td>
+<td align="right">0.453</td>
+<td align="right">0.117</td>
+<td align="right">3.875</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">golddiff_mean:BARON_NASHOR</td>
+<td align="right">-0.014</td>
+<td align="right">0.004</td>
+<td align="right">-3.845</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">golddiff_mean:kill_diff</td>
+<td align="right">0.003</td>
+<td align="right">0.001</td>
+<td align="right">2.664</td>
+<td align="right">0.008</td>
+</tr>
+<tr class="odd">
+<td align="left">BARON_NASHOR:kill_diff</td>
+<td align="right">-0.035</td>
+<td align="right">0.020</td>
+<td align="right">-1.730</td>
+<td align="right">0.084</td>
+</tr>
+<tr class="even">
+<td align="left">outer_mean_diff:golddiff_mean</td>
+<td align="right">0.001</td>
+<td align="right">0.000</td>
+<td align="right">2.516</td>
+<td align="right">0.012</td>
+</tr>
+<tr class="odd">
+<td align="left">golddiff_mean:BARON_NASHOR:kill_diff</td>
+<td align="right">-0.001</td>
+<td align="right">0.001</td>
+<td align="right">-1.673</td>
+<td align="right">0.094</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>final_log = merge_file %&gt;% 
+  mutate(b_result = factor(b_result)) %&gt;% 
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR + golddiff_mean:kill_diff, family = &quot;binomial&quot;)
+ 
+final_log %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.390</td>
+<td align="right">0.104</td>
+<td align="right">-13.409</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">golddiff_mean</td>
+<td align="right">0.101</td>
+<td align="right">0.004</td>
+<td align="right">27.469</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">BARON_NASHOR</td>
+<td align="right">1.191</td>
+<td align="right">0.063</td>
+<td align="right">18.758</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">DRAGON</td>
+<td align="right">0.299</td>
+<td align="right">0.041</td>
+<td align="right">7.262</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">AIR_DRAGON</td>
+<td align="right">0.307</td>
+<td align="right">0.087</td>
+<td align="right">3.540</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">EARTH_DRAGON</td>
+<td align="right">0.197</td>
+<td align="right">0.077</td>
+<td align="right">2.552</td>
+<td align="right">0.011</td>
+</tr>
+<tr class="odd">
+<td align="left">WATER_DRAGON</td>
+<td align="right">0.196</td>
+<td align="right">0.078</td>
+<td align="right">2.493</td>
+<td align="right">0.013</td>
+</tr>
+<tr class="even">
+<td align="left">FIRE_DRAGON</td>
+<td align="right">0.620</td>
+<td align="right">0.082</td>
+<td align="right">7.594</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">golddiff_mean:BARON_NASHOR</td>
+<td align="right">-0.034</td>
+<td align="right">0.003</td>
+<td align="right">-11.290</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">golddiff_mean:kill_diff</td>
+<td align="right">0.002</td>
+<td align="right">0.000</td>
+<td align="right">6.536</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 

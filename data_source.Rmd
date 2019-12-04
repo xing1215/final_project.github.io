@@ -227,7 +227,7 @@ origin_df %>%
 ## read and clean the kills data
 
 ```{r,message=FALSE, warning=FALSE}
-kills <- read_csv("./data/kills.csv") %>% 
+kills = read_csv("./data/kills.csv") %>% 
   janitor::clean_names() %>% 
   mutate(address = str_remove(address,
         "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>%         
@@ -239,9 +239,13 @@ kills <- read_csv("./data/kills.csv") %>%
     values_from = "n") %>%
   mutate(diff = bKills - rKills)
 ## merge kills to merge_file.csv
+<<<<<<< HEAD
+merge_file = left_join(merge_file,kills,by="address")
+=======
 merge_file <- left_join(merge_file,kills,by = "address")
+>>>>>>> 8e1e2b71cd779937deb16f919930cd14aa97f199
 ## relevel b_results
-merge_file <- merge_file %>% 
+merge_file = merge_file %>% 
   mutate(b_result = relevel(b_result,"lose"))
 
 ```
@@ -253,6 +257,10 @@ merge_file %>% ggplot(aes(x = diff,y = b_result)) +
   geom_point()
 
 merge_file %>%  ggplot((aes(x = b_result,y = diff,group = b_result))) +
+<<<<<<< HEAD
+  geom_violin() +
+  coord_flip()
+=======
   geom_boxplot() +
   labs(
     title = "Fig4: the mean killing difference vs. battle result",
@@ -260,10 +268,10 @@ merge_file %>%  ggplot((aes(x = b_result,y = diff,group = b_result))) +
     y = "mean killing difference"
   )
 
+>>>>>>> 8e1e2b71cd779937deb16f919930cd14aa97f199
 merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point(alpha = 0.5) +
-  stat_smooth(method = "glm", se = FALSE, fullrange = TRUE, 
-              method.args = list(family = binomial))
+  stat_smooth(method = "glm", se = FALSE, method.args = list(family = binomial))
 ```
 
 ## export to csv
@@ -271,5 +279,12 @@ merge_file %>% ggplot(aes(x = diff,y = b_result)) +
 ```{r}
 write.csv(merge_file,"./data/merge.csv", row.names = FALSE)
 ```
+
+
+
+
+
+
+
 
 

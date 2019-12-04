@@ -1,6 +1,5 @@
 ---
-title: "**Report --- League of Legends Win attributes Analysis**"
-author: "_Lu Chen, Xing Chen, Ziyang Chen, Nankun Liu, Ziyi Zhao_"
+title: "Report --- League of Legends Win attributes Analysis"
 output: html_document
 ---
 
@@ -15,6 +14,7 @@ library(patchwork)
 library("Hmisc")
 ```
 
+By: Lu Chen, Xing Chen, Nankun Liu, Ziyi Zhao, Ziyang Chen
 
 # Introduction and Motivation
 

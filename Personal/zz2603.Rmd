@@ -55,12 +55,23 @@ bherowin = bind_cols(year,bresult,btopchamp) %>%
 
 ```
 
-
+# Every Hero Pick Rate across years
 
 ```{r}
 
 
 
+
 ```
+
+# The rate of Hero being banned across years
+
+```{r}
+
+```
+
+
+
+
 
 

@@ -283,8 +283,3 @@ write.csv(merge_file,"./data/merge.csv", row.names = FALSE)
 
 
 
-
-
-
-
-

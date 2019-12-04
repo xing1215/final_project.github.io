@@ -68,7 +68,7 @@ kills = read_csv("./data/kills.csv") %>%
   mutate(diff = bKills - rKills)
 ```
 * **Kill**
-Data of kill are nested in `kills.csv` file. This file captures the information about unique match id, team id, kill numbers and the time in the game for each kill.
+Data of kill are nested in `kills.csv` file. This file captures the information about unique match id, team id, kill numbers and the time in the game for each kill. We firstly used str() to look at variables and structure and find out that the dataset is in a longer format, because kills from red and blue teams are put in one variable 'team'. We used pivot_wider() to separate kill into two variables by teams. Then, we summarise two variable and acquired the number of kills each game for two teams. We use number of kills by blue team to substract the number of kills by red team, and create a new variable for the difference in number of kill between blue and red team.    
 
 #### Towers data tidy code
 

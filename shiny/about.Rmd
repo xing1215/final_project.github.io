@@ -45,25 +45,45 @@ match_df =
   filter(year != 2014) %>% 
   mutate(
     year = recode_factor(year, "2015" = "S5", "2016" = "S6", "2017" = "S7", "2018" = "S8"), 
-    year = fct_relevel(year, "S5", "S6", "S7", "S8")
+    year = fct_relevel(year, "S5", "S6", "S7", "S8"),
+    address = str_remove(address,
+                         "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")
   )
+
+bans = 
+  read_csv("./data/bans.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(address = 
+    str_remove(address,"http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
+  pivot_longer(ban_1:ban_5,
+               names_to = "bannumber",
+               values_to = "champ_name") %>% 
+  drop_na(champ_name)
+year_col = merge %>% select(address,year)
+bans = 
+  left_join(bans,year_col,by = "address") %>% 
+  filter(year != 2014) %>% 
+  mutate(
+    year = recode_factor(year, "2015" = "S5", "2016" = "S6", "2017" = "S7", "2018" = "S8"), 
+    year = fct_relevel(year, "S5", "S6", "S7", "S8"))
+  
 
 # rsconnect::deployApp('/Users/xingchen/Desktop/Data Science/final_project/final_project.github.io/shiny')
 ```
 
-Page1
+Champions BPW
 ==============================
 
 Column {.sidebar}
 -----------------------------------------------------------------------
 
 ```{r}
+# selectInput widget, something like a dropdown menu
 year = 
   origin_df %>% 
   distinct(year) %>% 
   pull()
 
-# selectInput widget, something like a dropdown menu
 selectInput(
   "year_choice", 
   label = h3("Select year"),
@@ -71,6 +91,7 @@ selectInput(
   selected = "S8"
 )
 
+# radioButtons widget
 position = 
   match_df %>% 
   select(year, starts_with("blue_")) %>% 
@@ -84,25 +105,55 @@ position =
   mutate(champ_types = str_remove(champ_types, "_champ")) %>% 
   distinct(champ_types) %>% pull()
   
-# radioButtons widget
 radioButtons(
   "position_choice", 
   label = h3("select position"),
   choices = position, selected = "adc")
+
+# widget for bans
+team_ban = bans %>% distinct(team) %>% pull()
+
+radioButtons(
+  "team_choice",
+  label = h3("team select (for ban rate only)"),
+  choices = team_ban, selected = "blueBans"
+)
 ```
 
-Column {data-width=650}
+Column {data-width=500}
 -----------------------------------------------------------------------
 
-### Chart A
+### Champion's ban rate
+
+```{r}
+renderPlotly({
+  bans %>% 
+  filter(year == input[["year_choice"]], team == input[["team_choice"]]) %>% 
+  mutate(champ_name = factor(champ_name),
+         totalgame = dim(.)[1]) %>% 
+  group_by(champ_name) %>% 
+  mutate(totalban = n(),
+         banrate = totalban / totalgame) %>% 
+  ungroup(champ_name) %>% 
+  mutate(champ_name = forcats::fct_reorder(champ_name,banrate)) %>% 
+  ggplot(aes(x = champ_name,y = banrate,fill = champ_name)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text = element_text(size = 5)) +
+  coord_flip() +
+  viridis::scale_fill_viridis(discrete = TRUE)
+})
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Champions' Win Rate
 
 ```{r}
 renderPlotly({
   match_df %>% 
     select(address,year,b_result,blue_top_champ,blue_jungle_champ,
-           blue_middle_champ,blue_adc_champ,blue_support_champ) %>%
-    mutate(address = str_remove(address,
-          "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
+           blue_middle_champ,blue_adc_champ,blue_support_champ) %>% 
     pivot_longer(
       blue_top_champ:blue_support_champ,
       names_to = "champ_position",
@@ -121,32 +172,51 @@ renderPlotly({
       hero_name = forcats::fct_reorder(hero_name,win_rate,.desc = FALSE)) %>% 
     ggplot(aes(x = hero_name,y = win_rate,fill = hero_name)) +
     geom_bar(stat = "identity") +
-    theme(axis.text.x = element_text(angle = 90,hjust = 1),
-          axis.title = element_text(size = 25,face = "bold"),
-          axis.text = element_text(size = 15),
-          plot.title = element_text(size = 26,face = "bold")) +
-    coord_flip() +
-    viridis::scale_fill_viridis(discrete = TRUE)
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          axis.title = element_text(size = 20),
+          axis.text = element_text(size = 10)) +
+    viridis::scale_fill_viridis(discrete = TRUE) +
+    labs(
+      x = "",
+      y = "win rate")
 })
 ```
 
-Column {data-width=350}
------------------------------------------------------------------------
-
-### Chart B
+### Champion's pick rate
 
 ```{r}
-
+renderPlotly({
+  match_df %>% 
+  select(
+    address,year,blue_top_champ,blue_middle_champ,blue_jungle_champ,
+    blue_adc_champ,blue_support_champ,red_top_champ,red_middle_champ,
+    red_jungle_champ,red_adc_champ,red_support_champ) %>% 
+  pivot_longer(
+    blue_top_champ:red_support_champ,
+    names_to = "champ_position",
+    values_to = "champ_name",
+    names_prefix = "blue_") %>% 
+  mutate(champ_position = str_remove(champ_position, "_champ")) %>% 
+  filter(year == input[["year_choice"]],champ_position == input[["position_choice"]]) %>% 
+  mutate(
+    champ_name = factor(champ_name),
+    totalgame = dim(.)[1]
+  ) %>% 
+  group_by(champ_name) %>% 
+  mutate(totalpick = n(),
+         pickrate = totalpick/totalgame) %>% 
+  ungroup(champ_name) %>% 
+  mutate(champ_name = forcats::fct_reorder(champ_name,pickrate)) %>% 
+  ggplot(aes(x = champ_name,y = pickrate,fill = champ_name)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text = element_text(size = 5)) +
+  coord_flip() +
+  viridis::scale_fill_viridis(discrete = TRUE)
+})
 ```
 
-### Chart C
 
-```{r}
-
-```
-
-
-Probability of Winning the game
+Winning rate simulator
 ===================================== 
 
 Column {.sidebar}
@@ -230,5 +300,6 @@ renderPrint({
   prob
 })
 ```
+
 
 

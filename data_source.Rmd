@@ -11,6 +11,8 @@ output:
 library(tidyverse)
 library(readr)
 library(scales)
+library(ggridges)
+library(patchwork)
 
 knitr::opts_chunk$set(
 	echo = TRUE,
@@ -84,10 +86,13 @@ some visualizations
 ```{r,message=FALSE, warning=FALSE}
 merge_file %>% 
   ggplot(aes(x = b_result, y = outer_mean_diff)) + 
-  geom_boxplot()
+  geom_boxplot() +
+  labs(
+    title = "Fig1: time length of destroying enemy's towers vs. battle reuslts", 
+    x = "results of blue team",
+    y = "mean time difference of destroying towers"
+  )
 ```
-
-bTower means the mean time blue team destroy enemy's outer towers among three lanes, rTower means the mean time red team destroy enemy's outer towers among three lanes. We care about the impact of different of mean time between two groups. from the plot, we can see that if bTower is smaller than rTower (meaning that blue teams destroy red teams' outer tower faster) there will be a higher win rate among blue teams
 
 
 ## read and clean the gold data
@@ -125,10 +130,13 @@ merge_file = left_join(merge_file, gold_ave, by = "address")
 ```{r,message=FALSE, warning=FALSE}
 merge_file %>% 
   ggplot(aes(x = b_result, y = golddiff_mean)) + 
-  geom_boxplot()
+  geom_boxplot() +
+  labs(
+    title = "Fig2: total golds difference vs. battle results",
+    x = "results of blue team", 
+    y = "mean gold difference"
+  )
 ```
-
-The figure above shows the average gold difference across the whole game when blue team wins and blue team loses. The gold difference is calculated by the total gold of blue team minus that of red team in every minutes of the game. As we expected, the average mean of gold difference should be higher when blue team wins the game. 
 
 
 ## read and clean the neutral kills data
@@ -160,6 +168,26 @@ merge_file = left_join(merge_file, monster, by = "address")
 ```
 
 visualizations
+
+```{r}
+merge_file %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    baron_nashor:fire_dragon,
+    names_to = "neutral_monster",
+    values_to = "number"
+  ) %>% 
+  group_by(b_result, neutral_monster) %>% 
+  summarize(number = sum(number, na.rm = TRUE)) %>% 
+  ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
+  geom_bar(stat = "identity", position = position_dodge()) + 
+  coord_flip() + 
+  labs(
+    title = "Fig3: numbers of killing neutral monsters vs. battle results",
+    x = "numbers of kills",
+    y = "type of neutral monsters"
+  )
+```
 
 ```{r,message=FALSE, warning=FALSE}
 origin_df = read_csv("./data/LeagueofLegends.csv") %>% janitor::clean_names()
@@ -211,7 +239,11 @@ kills = read_csv("./data/kills.csv") %>%
     values_from = "n") %>%
   mutate(diff = bKills - rKills)
 ## merge kills to merge_file.csv
+<<<<<<< HEAD
 merge_file = left_join(merge_file,kills,by="address")
+=======
+merge_file <- left_join(merge_file,kills,by = "address")
+>>>>>>> 8e1e2b71cd779937deb16f919930cd14aa97f199
 ## relevel b_results
 merge_file = merge_file %>% 
   mutate(b_result = relevel(b_result,"lose"))
@@ -223,9 +255,20 @@ do some visualization
 ```{r,message=FALSE, warning=FALSE}
 merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point()
+
 merge_file %>%  ggplot((aes(x = b_result,y = diff,group = b_result))) +
+<<<<<<< HEAD
   geom_violin() +
   coord_flip()
+=======
+  geom_boxplot() +
+  labs(
+    title = "Fig4: the mean killing difference vs. battle result",
+    x = "results of blue team",
+    y = "mean killing difference"
+  )
+
+>>>>>>> 8e1e2b71cd779937deb16f919930cd14aa97f199
 merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point(alpha = 0.5) +
   stat_smooth(method = "glm", se = FALSE, method.args = list(family = binomial))

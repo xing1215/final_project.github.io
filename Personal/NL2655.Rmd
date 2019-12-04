@@ -4,25 +4,82 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readr)
+library(scales)
+
+knitr::opts_chunk$set(
+	echo = TRUE,
+	warning = FALSE,
+	fig.width = 8, 
+  fig.height = 6,
+  out.width = "90%"
+)
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+merge_file = read_csv("./data/merge.csv")
+merge_file =
+  merge_file %>% 
+  mutate(
+    b_result = recode_factor(b_result, "lose" = "0", "win" = "1"),
+    kill_diff = diff,
+    golddiff_mean = golddiff_mean/100
+  ) %>% 
+  select(-diff)
 ```
 
-## Including Plots
+## logistic model
 
-You can also embed plots, for example:
+```{r}
+mult_log = merge_file %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ outer_mean_diff + golddiff_mean + BARON_NASHOR + DRAGON + RIFT_HERALD + AIR_DRAGON + EARTH_DRAGON + ELDER_DRAGON + WATER_DRAGON + FIRE_DRAGON + kill_diff, family = "binomial")
+ 
+mult_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+tow_log = merge_file %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ outer_mean_diff, family = "binomial")
+ 
+tow_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+
+```{r}
+tow_gold_log = merge_file %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ outer_mean_diff + golddiff_mean, family = "binomial")
+ 
+tow_gold_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+## shiny used
+
+```{r}
+plot_log = merge_file %>% 
+  filter(year != 2014) %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON + kill_diff, family = "binomial")
+ 
+plot_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+

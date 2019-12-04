@@ -2,15 +2,18 @@ name: "League of Legends Prediction"
 output_dir: "."
 navbar:
   title: "Home"
-  left:
-    - text: "About"
-      href: about.html
-    - text: "data_source"
-      href: data_source.html
   
   right:
-    - icon: fas fa-chart-line fa-lg
+    - text: "EDA"
       href: visualization.html
+    - text: "Shiny"
+      href: https://xing1215.shinyapps.io/shiny/
+    - text: "Hero"
+      href: .html
+    - text: "Report"
+      href: data_source.html
+    - icon: fas fa-gamepad fa-lg
+      href: https://play.na.leagueoflegends.com/en_US
     - icon: fa-github fa-lg
       href: https://github.com/xing1215/final_project.github.io
 

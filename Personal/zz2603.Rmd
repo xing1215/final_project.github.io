@@ -53,13 +53,13 @@ bherowin = bind_cols(year,bresult,btopchamp) %>%
   viridis::scale_fill_viridis(discrete = TRUE)+
   facet_grid(.~year)
 
-
-
 ```
 
 
 
 ```{r}
+
+
 
 ```
 

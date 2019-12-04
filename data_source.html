@@ -347,17 +347,24 @@ div.tocify {
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <li>
-  <a href="about.html">About</a>
-</li>
-<li>
-  <a href="data_source.html">data_source</a>
-</li>
+        
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="visualization.html">
-    <span class="fas fa fas fa-chart-line fa-lg"></span>
+  <a href="visualization.html">EDA</a>
+</li>
+<li>
+  <a href="https://xing1215.shinyapps.io/shiny/">Shiny</a>
+</li>
+<li>
+  <a href=".html">Hero</a>
+</li>
+<li>
+  <a href="data_source.html">Report</a>
+</li>
+<li>
+  <a href="https://play.na.leagueoflegends.com/en_US">
+    <span class="fas fa fas fa-gamepad fa-lg"></span>
      
   </a>
 </li>
@@ -429,9 +436,13 @@ div.tocify {
 <p>some visualizations</p>
 <pre class="r"><code>merge_file %&gt;% 
   ggplot(aes(x = b_result, y = outer_mean_diff)) + 
-  geom_boxplot()</code></pre>
+  geom_boxplot() +
+  labs(
+    title = &quot;Fig1: time length of destroying enemy&#39;s towers vs. battle reuslts&quot;, 
+    x = &quot;results of blue team&quot;,
+    y = &quot;mean time difference of destroying towers&quot;
+  )</code></pre>
 <p><img src="data_source_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
-<p>bTower means the mean time blue team destroy enemy’s outer towers among three lanes, rTower means the mean time red team destroy enemy’s outer towers among three lanes. We care about the impact of different of mean time between two groups. from the plot, we can see that if bTower is smaller than rTower (meaning that blue teams destroy red teams’ outer tower faster) there will be a higher win rate among blue teams</p>
 </div>
 <div id="read-and-clean-the-gold-data" class="section level2">
 <h2>read and clean the gold data</h2>
@@ -460,9 +471,13 @@ gold_ave =
 <pre class="r"><code>merge_file = left_join(merge_file, gold_ave, by = &quot;address&quot;)</code></pre>
 <pre class="r"><code>merge_file %&gt;% 
   ggplot(aes(x = b_result, y = golddiff_mean)) + 
-  geom_boxplot()</code></pre>
+  geom_boxplot() +
+  labs(
+    title = &quot;Fig2: total golds difference vs. battle results&quot;,
+    x = &quot;results of blue team&quot;, 
+    y = &quot;mean gold difference&quot;
+  )</code></pre>
 <p><img src="data_source_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
-<p>The figure above shows the average gold difference across the whole game when blue team wins and blue team loses. The gold difference is calculated by the total gold of blue team minus that of red team in every minutes of the game. As we expected, the average mean of gold difference should be higher when blue team wins the game.</p>
 </div>
 <div id="read-and-clean-the-neutral-kills-data" class="section level2">
 <h2>read and clean the neutral kills data</h2>
@@ -486,6 +501,24 @@ monster[is.na(monster)] = 0</code></pre>
 <p>merge</p>
 <pre class="r"><code>merge_file = left_join(merge_file, monster, by = &quot;address&quot;)</code></pre>
 <p>visualizations</p>
+<pre class="r"><code>merge_file %&gt;% 
+  janitor::clean_names() %&gt;% 
+  pivot_longer(
+    baron_nashor:fire_dragon,
+    names_to = &quot;neutral_monster&quot;,
+    values_to = &quot;number&quot;
+  ) %&gt;% 
+  group_by(b_result, neutral_monster) %&gt;% 
+  summarize(number = sum(number, na.rm = TRUE)) %&gt;% 
+  ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
+  geom_bar(stat = &quot;identity&quot;, position = position_dodge()) + 
+  coord_flip() + 
+  labs(
+    title = &quot;Fig3: numbers of killing neutral monsters vs. battle results&quot;,
+    x = &quot;numbers of kills&quot;,
+    y = &quot;type of neutral monsters&quot;
+  )</code></pre>
+<p><img src="data_source_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
 <pre class="r"><code>origin_df = read_csv(&quot;./data/LeagueofLegends.csv&quot;) %&gt;% janitor::clean_names()
 
 blank_theme &lt;- theme_minimal() +
@@ -517,7 +550,7 @@ origin_df %&gt;%
   scale_fill_manual(labels = c(&quot;Blue&quot;, &quot;Red&quot;), values = c(&quot;cadetblue1&quot;, &quot;coral1&quot;)) + 
   blank_theme +
   theme(axis.text.x = element_blank())</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
+<p><img src="data_source_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
 </div>
 <div id="read-and-clean-the-kills-data" class="section level2">
 <h2>read and clean the kills data</h2>
@@ -533,23 +566,31 @@ origin_df %&gt;%
     values_from = &quot;n&quot;) %&gt;%
   mutate(diff = bKills - rKills)
 ## merge kills to merge_file.csv
-merge_file &lt;- left_join(merge_file,kills,by=&quot;address&quot;)
+merge_file &lt;- left_join(merge_file,kills,by = &quot;address&quot;)
 ## relevel b_results
 merge_file &lt;- merge_file %&gt;% 
   mutate(b_result = relevel(b_result,&quot;lose&quot;))</code></pre>
 <p>do some visualization</p>
 <pre class="r"><code>merge_file %&gt;% ggplot(aes(x = diff,y = b_result)) + 
   geom_point()</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-13-1.png" width="90%" /></p>
+<p><img src="data_source_files/figure-html/unnamed-chunk-14-1.png" width="90%" /></p>
 <pre class="r"><code>merge_file %&gt;%  ggplot((aes(x = b_result,y = diff,group = b_result))) +
   geom_boxplot() +
-  coord_flip()</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-13-2.png" width="90%" /></p>
+  labs(
+    title = &quot;Fig4: the mean killing difference vs. battle result&quot;,
+    x = &quot;results of blue team&quot;,
+    y = &quot;mean killing difference&quot;
+  )</code></pre>
+<p><img src="data_source_files/figure-html/unnamed-chunk-14-2.png" width="90%" /></p>
 <pre class="r"><code>merge_file %&gt;% ggplot(aes(x = diff,y = b_result)) + 
   geom_point(alpha = 0.5) +
   stat_smooth(method = &quot;glm&quot;, se = FALSE, fullrange = TRUE, 
               method.args = list(family = binomial))</code></pre>
-<p><img src="data_source_files/figure-html/unnamed-chunk-13-3.png" width="90%" /></p>
+<p><img src="data_source_files/figure-html/unnamed-chunk-14-3.png" width="90%" /></p>
+</div>
+<div id="export-to-csv" class="section level2">
+<h2>export to csv</h2>
+<pre class="r"><code>write.csv(merge_file,&quot;./data/merge.csv&quot;, row.names = FALSE)</code></pre>
 </div>
 </div>
 

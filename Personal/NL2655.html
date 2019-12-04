@@ -578,6 +578,93 @@ tow_gold_log %&gt;%
 </tbody>
 </table>
 </div>
+<div id="shiny-used" class="section level2">
+<h2>shiny used</h2>
+<pre class="r"><code>plot_log = merge_file %&gt;% 
+  filter(year != 2014) %&gt;% 
+  mutate(b_result = factor(b_result)) %&gt;% 
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON + kill_diff, family = &quot;binomial&quot;)
+ 
+plot_log %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.417</td>
+<td align="right">0.151</td>
+<td align="right">-9.401</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">golddiff_mean</td>
+<td align="right">0.007</td>
+<td align="right">0.003</td>
+<td align="right">2.244</td>
+<td align="right">0.025</td>
+</tr>
+<tr class="odd">
+<td align="left">BARON_NASHOR</td>
+<td align="right">1.044</td>
+<td align="right">0.086</td>
+<td align="right">12.184</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">DRAGON</td>
+<td align="right">0.307</td>
+<td align="right">0.059</td>
+<td align="right">5.247</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">AIR_DRAGON</td>
+<td align="right">0.615</td>
+<td align="right">0.130</td>
+<td align="right">4.748</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">EARTH_DRAGON</td>
+<td align="right">0.211</td>
+<td align="right">0.111</td>
+<td align="right">1.899</td>
+<td align="right">0.058</td>
+</tr>
+<tr class="odd">
+<td align="left">WATER_DRAGON</td>
+<td align="right">0.263</td>
+<td align="right">0.112</td>
+<td align="right">2.351</td>
+<td align="right">0.019</td>
+</tr>
+<tr class="even">
+<td align="left">FIRE_DRAGON</td>
+<td align="right">0.437</td>
+<td align="right">0.116</td>
+<td align="right">3.784</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">kill_diff</td>
+<td align="right">0.465</td>
+<td align="right">0.016</td>
+<td align="right">28.816</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 
 

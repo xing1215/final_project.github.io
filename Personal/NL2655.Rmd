@@ -70,3 +70,16 @@ tow_gold_log %>%
   knitr::kable(digits = 3)
 ```
 
+## shiny used
+
+```{r}
+plot_log = merge_file %>% 
+  filter(year != 2014) %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON + kill_diff, family = "binomial")
+ 
+plot_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+

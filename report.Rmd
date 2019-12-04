@@ -12,20 +12,21 @@ library(readr)
 library(scales)
 library(ggridges)
 library(patchwork)
+library("Hmisc")
 ```
 
 
 # Introduction and Motivation
 
-League of Legends (LoL) is an immensely popular multiplayer online battle arena game, with over 100 million monthly active users worldwide. It hosts progressional competitions throughout the year and had 43 million viewers in the 2016 World Championships alone. For context, that’s more than the 30.8 million viewers that watched Game 7 of the 2016 NBA finals! Published by Riot Games, LOL is clearly fun and addictive once you get started. For those who haven’t, here’s a quick [overview](https://www.youtube.com/watch?v=mxxdeBIwNOs) of the game itself.
+League of Legends (LoL) is an immensely popular multiplayer online battle arena game, with over 100 million monthly active users worldwide. It hosts progressional competitions throughout the year and had 43 million viewers in the 2016 World Championships alone. For context, that’s more than the 30.8 million viewers that watched Game 7 of the 2016 NBA finals! Published by Riot Games, LOL is clearly fun and addictive once you get started. For those who haven't, here’s a quick [overview](https://www.youtube.com/watch?v=mxxdeBIwNOs).
 
-Basically, 10 players are divided into 2 teams (blue or red) in the main LoL game (there are 3 modes) after each of them have declared which champion (there are over 100 champions) they are going to play for the match they are in. The objective for each team is to destroy the opposing team’s “Nexus”. Think of the Nexus as the main building in a base camp. Destroy the enemy Nexus and your team wins the game. Protect yours or your team loses the game. Simple enough. However, the collaboration often required between teammates to advance on the enemy Nexus, while defending its own, is wonderfully complex.
+10 players are divided into 2 teams (either blue or red) in the main LoL game (there are 3 modes). Before the battle begins, each player is going to declare the character, also known as champion, he/she intended to use and role-play it for the resting game. The objective for each team is to destroy the opposing team’s “Nexus”. Think of the Nexus as the main building in a base camp. Destroy the enemy Nexus and your team wins the game. Protect yours or your team loses the game. Simple enough. However, the collaboration often required between teammates to advance on the enemy Nexus, while defending its own, is wonderfully complex.
 
-All of our team members love League of Legends so much and this game has become an integral part of our lives. We really enjoy winning the game, though we do not always win. We know the taste of failure very well. So we are very curious about the deteminants of winning the game, other than unmeasurable data such as personal skills and team cooperation. For this project, we focus on analyze game result of blue team(winning on blue team implies losing on red team and vice versa, so only one team is needed to be analyzed).
+All of our team members love League of Legends so much and this game has become an integral part of our lives. We really enjoy winning the game, though we do not always win. So we are very curious about the deteminants of winning the game, other than unmeasurable data such as personal skills and team cooperation. For this project, we focus on analyze game results of the blue team (winning on the blue team implies losing on the red team. So analyzing one team is enough).
 
 # Related work and inspiration
 
-Out of curiosity about how to better win in the game, our group unintentionally saw a report on how to [use machine learning to predict the winning ratio of League of Legends games](https://medium.com/trendkite-dev/machine-learning-league-of-legends-victory-predictions-8bc6cbc7754e). However, this report is too general, and it does not show the data and the detailed operation method in detail. It's a bit vague for those of us who have little knowledge about machine learning. So we decided to find the data ourselves, and use our knowledge reserves to simply predict the outcome of the game.
+During the research phase, this article [use machine learning to predict the winning ratio of League of Legends games](https://medium.com/trendkite-dev/machine-learning-league-of-legends-victory-predictions-8bc6cbc7754e) attracts our attention. After intensive reading, however, we found that this report is too general. It does not show data either the detailed operation method. It is vague for us who have little background in machine learning. So we decide to find data by ourselves and use our knowledge reserves to simply predict the outcome of the game.
 
 # Initial Questions
 
@@ -43,25 +44,23 @@ Out of curiosity about how to better win in the game, our group unintentionally 
 
 # Data Source and Data Cleaning
 
-We used [League of Legends competitive matches dataset](https://www.kaggle.com/chuckephron/leagueoflegends) to obtain matches data between 2015 to 2018 from [kaggle](https://www.kaggle.com/), a data modeling and data analysis competition platform. The complete data consists of eight different csv files, and each csv file contains different types of data(`_columns.csv`, `bans.csv`, `gold.csv`, `kills.csv`, `matchinfo.csv`, `monsters.csv`, `structures.csv`, `leagueoflegends.csv`). 
+We used [League of Legends competitive matches dataset](https://www.kaggle.com/chuckephron/leagueoflegends) to obtain matches data between 2015 to 2018 from [kaggle](https://www.kaggle.com/), a data modeling and data analysis competition platform. The complete dataset consists of eight different csv files, and each csv file contains different types of data (`_columns.csv`, `bans.csv`, `gold.csv`, `kills.csv`, `matchinfo.csv`, `monsters.csv`, `structures.csv`, `leagueoflegends.csv`). 
 
-We first glanced at the information contained in each data. Then filter out the data that is useful to us for processing. There were five factors that we cared about the most --- kills, towers, monsters, champions and golds.
+We first glance at the content of each file. Then we filter out the useful data for processing. Turns out, there are five factors that we cared about the most --- kills, towers, monsters, champions and golds.
 
 #### Kill data tidy code
 
 Click to see the complete tidy procedures
 
 ```{r kill, warning = FALSE, message = FALSE}
-kills <- read_csv("./data/kills.csv") %>% 
+kills = read_csv("./data/kills.csv") %>% 
   janitor::clean_names() %>% 
-  mutate(address = str_remove(address,
-        "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>%         
-  group_by(address,team) %>%
-  select(address,team) %>% 
-  summarize(n = n()) %>% 
+  mutate(address = str_remove(address,"http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>%  
+  group_by(address, team) %>% 
+  summarise(number = n()) %>% 
   pivot_wider(
     names_from = "team",
-    values_from = "n") %>%
+    values_from = "number") %>%
   mutate(diff = bKills - rKills)
 ```
 * **Kill**
@@ -113,7 +112,7 @@ monster =
   monster %>% 
   filter(team %in% c("bDragons", "bBarons", "bHeralds")) %>% 
   group_by(address, type) %>% 
-  summarize(number = n()) %>% 
+  summarise(number = n()) %>% 
   pivot_wider(
     names_from = type,
     values_from = number
@@ -146,7 +145,7 @@ gold =
 gold_ave =
   gold %>% 
   group_by(address) %>% 
-  summarize(
+  summarise(
     golddiff_mean = mean(gold)
   )
 ```
@@ -234,7 +233,7 @@ merge_file %>%
     values_to = "number"
   ) %>% 
   group_by(b_result, neutral_monster) %>% 
-  summarize(number = sum(number, na.rm = TRUE)) %>% 
+  summarise(number = sum(number, na.rm = TRUE)) %>% 
   ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
   geom_bar(stat = "identity", position = position_dodge()) + 
   coord_flip() + 
@@ -330,6 +329,46 @@ However, when we built another model with covariates `outer_mean_diff` and `gold
 
 # Additional Analysis
 
-说一下correlation
+Based on our experience with League of Legends, most of the things that a player has done in a game are related to golds. For example, kills will earn golds, taking down towers will earn golds, and making good use of the boosting effect gained by slaying monsters can also help to earn golds. This means that the four predictors may be correlated. Therefore, we set to test for correlation between the four variables we chose. (Note we only preserved monsters variables for those with large effect size in our full model, i.e beta > 0.4) 
+
+```{r}
+my_data =
+  merge_file %>% 
+  filter(year != 2014) %>% 
+  #select(-address, -year, -b_result, -bKills, -rKills, -bTowers, -rTowers) %>% #
+  select(outer_mean_diff, golddiff_mean, kill_diff, BARON_NASHOR, AIR_DRAGON, FIRE_DRAGON) %>%
+  rename(
+    tower = "outer_mean_diff",
+    gold = "golddiff_mean",
+    kill = "kill_diff",
+    nashor = "BARON_NASHOR",
+    air = "AIR_DRAGON",
+    fire = "FIRE_DRAGON"
+  ) %>% 
+  drop_na()
+res <- cor(my_data)
+round(res, 3) %>% 
+  knitr::kable()
+```
+
+We saw that the correaltion between golds and kills was 0.789. This correlation value was very high in respective to other variables. The finding convinced us that a large part of effect from variable `kill_diff` can in fact be explained by the effect from `golddiff_mean`. On this account, we suspected that the effect of other variables on the blue team's result of a game might be modified by the effect of gold difference. So we tried adding interaction terms into our full model. Specifically, we made `golddiff_mean` to interact with only `kill_diff` and all the monsters variable `Baron_Nashor`. The reason we did so was that these two variables had the largest effect size and were significant under the full model.
+
+```{r}
+final_log = merge_file %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + kill_diff + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR + golddiff_mean:kill_diff, family = "binomial")
+ 
+final_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+Amongst two of the interaction terms, the interaction bewteen `golddiff_mean` and `BARON_NASHOR` was significant while the interaction bewteen `gloddiff_mean` and `kill_diff` was not. One thing needed to be noted here was that the coefficient of the interaction bewteen `golddiff_mean` and `BARON_NASHOR` was negative. This indicated that if blue team had both gold lead and had taken down baron nashor, the two things togther made the increament in the odds of winning by blue team less.
 
 # Discussion
+
+By using the League of Legends Competitive Matches data, we were able to simply inspect what factors might affect the result of a single League of Legends game and how did those factors act on influencing the result. By employing the exploratory data analysis as well as statistical analysis, we were able to state that more kills, taking down towers faster, slaying monsters and having more golds did raise the chance of winning for blue team, even though the predictor representing taking down twoers' time was non-significant in our logistic model. But this could be explained from other perspective and we did suggested an alternative reason in the statistical analysis section. Furthermore, the correlation between covariates showed that all the variables were more or less related to golds. This makes sense since almost all the strategies and plays you make in the game are bound to help you gain more golds so that you can expand the lead for your team and win the game. 
+
+Nonetheless, there are some intrinsic problems in the data that we used. For example, most of the data consist with matches from master series(where professional players contest). All of the players are extremly skillful and adpot subtle statics. Hence, the data from these matches may look quite difference from the data from the normal matches for amateur players like us. Therefore, the external validity of the regression model inferred by the data will be hurted. The analyses we did may only be valid for analyzing professional matches. Also, the data do not include information about each champion's individual value such as attack damage value, defense value and magic ability damage value. Thus, we were not able to make any inference about the affect of the champions being picked on the result of a game. For example, what if all the 5 champions chose by blue team have higher attack damage than that of the red team? We don't know because we don't have these data.
+
+If we were to make further prediction for the result of a League of Legends game, we may need more information and we ought to take deeper investigation on the data.

@@ -1,6 +1,5 @@
 ---
-title: "**Report --- League of Legends Win attributes Analysis**"
-author: "_Lu Chen, Xing Chen, Ziyang Chen, Nankun Liu, Ziyi Zhao_"
+title: "Report --- League of Legends Win attributes Analysis"
 output: html_document
 ---
 
@@ -14,6 +13,7 @@ library(ggridges)
 library(patchwork)
 ```
 
+By: Lu Chen, Xing Chen, Nankun Liu, Ziyi Zhao, Ziyang Chen
 
 # Introduction and Motivation
 
@@ -333,3 +333,5 @@ However, when we built another model with covariates `outer_mean_diff` and `gold
 说一下correlation
 
 # Discussion
+
+

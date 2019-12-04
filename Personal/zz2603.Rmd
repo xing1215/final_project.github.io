@@ -18,40 +18,33 @@ library(tidyverse)
 matchinfo = read_csv("./data/matchinfo.csv") %>% 
   janitor::clean_names()
 
-btopchamp = pull(matchinfo,blue_top_champ) %>% as_tibble()
-colnames(btopchamp) = "blue_top_champ"  
-
-bresult = pull(merge_file,b_result) %>% as_tibble()
-colnames(bresult) = "b_result"
-
-year = pull(merge_file,year) %>% as_tibble()
-colnames(year) = "year"
-
-bherowin = bind_cols(year,bresult,btopchamp) %>%
-  mutate(blue_top_champ = factor(blue_top_champ),
-         year = factor(year),
-         year = relevel(year,"2015")) %>% 
-  group_by(blue_top_champ) %>% 
+bchamp = matchinfo %>% 
+  select(address,year,b_result,blue_top_champ,blue_jungle_champ,
+         blue_middle_champ,blue_adc_champ,blue_support_champ) %>%
+  mutate(address = str_remove(address,
+        "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
+  pivot_longer(blue_top_champ:blue_support_champ,
+               names_to = "champ_position",
+               values_to = "champ_name")
+  
+bchamp %>% filter(year==2015,champ_position=="blue_top_champ") %>% 
+  mutate(hero_name = as.factor(champ_name)) %>% 
+  group_by(hero_name) %>% 
   mutate(total=n()) %>% 
-  filter(b_result=="win") %>% 
+  filter(b_result==1) %>% 
   mutate(nwin=n(),
          win_rate = nwin/total) %>% 
-  ungroup(blue_top_champ) %>% 
+  ungroup(hero_name) %>% 
   mutate(
-    blue_top_champ = fct_reorder(blue_top_champ,win_rate,.desc=FALSE)) %>% 
-  ggplot(aes(x=blue_top_champ,y=win_rate,fill=blue_top_champ))+
+    hero_name = forcats::fct_reorder(hero_name,win_rate,.desc=FALSE)) %>% 
+  ggplot(aes(x=hero_name,y=win_rate,fill=hero_name))+
   geom_bar(stat="identity")+
-  labs(
-    x="Hero",
-    y="Win Rate",
-    title = "Number of top champion in blue team")+
   theme(axis.text.x = element_text(angle = 90,hjust=1),
         axis.title = element_text(size = 25,face = "bold"),
         axis.text = element_text(size=15),
         plot.title = element_text(size=26,face = "bold"))+
   coord_flip()+
-  viridis::scale_fill_viridis(discrete = TRUE)+
-  facet_grid(.~year)
+  viridis::scale_fill_viridis(discrete = TRUE)
 
 ```
 

@@ -119,6 +119,27 @@ kill and nashor cor = 0.41,
 others cor around 0.1.
 
 ```{r}
+adjust_log = merge_file %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ golddiff_mean + kill_diff + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON, family = "binomial")
+ 
+adjust_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+```{r}
+adjust_log = merge_file %>% 
+  mutate(b_result = factor(b_result)) %>% 
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON, family = "binomial")
+ 
+adjust_log %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+
+```{r}
 corr_log = merge_file %>% 
   mutate(b_result = factor(b_result)) %>% 
   glm(formula =  b_result ~ outer_mean_diff + golddiff_mean * BARON_NASHOR * kill_diff + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON + outer_mean_diff:golddiff_mean, family = "binomial")
@@ -131,7 +152,7 @@ corr_log %>%
 ```{r}
 final_log = merge_file %>% 
   mutate(b_result = factor(b_result)) %>% 
-  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + kill_diff + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR + golddiff_mean:kill_diff, family = "binomial")
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR, family = "binomial")
  
 final_log %>% 
   broom::tidy() %>% 

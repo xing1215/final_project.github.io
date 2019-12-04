@@ -152,7 +152,7 @@ corr_log %>%
 ```{r}
 final_log = merge_file %>% 
   mutate(b_result = factor(b_result)) %>% 
-  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR + golddiff_mean:kill_diff, family = "binomial")
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR, family = "binomial")
  
 final_log %>% 
   broom::tidy() %>% 

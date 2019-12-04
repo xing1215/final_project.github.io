@@ -51,7 +51,34 @@ bchamp %>% filter(year==2015,champ_position=="blue_top_champ") %>%
 # Every Hero Pick Rate across years
 
 ```{r}
+allchamp = matchinfo %>% 
+  select(address,year,blue_top_champ,blue_middle_champ,blue_jungle_champ,
+         blue_adc_champ,blue_support_champ,red_top_champ,red_middle_champ,
+         red_jungle_champ,red_adc_champ,red_support_champ) %>% 
+  mutate(address = str_remove(address,
+        "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
+  pivot_longer(blue_top_champ:red_support_champ,
+               names_to = "champ_position",
+               values_to = "champ_name")
 
+allchamp %>% filter(year==2015,champ_position=="blue_top_champ") %>% 
+  mutate(champ_name = factor(champ_name),
+         totalgame = dim(.)[1]) %>% 
+  group_by(champ_name) %>% 
+  mutate(totalpick = n(),
+         pickrate = totalpick/totalgame) %>% 
+  ungroup(champ_name) %>% 
+  mutate(champ_name = forcats::fct_reorder(champ_name,pickrate)) %>% 
+  ggplot(aes(x=champ_name,y=pickrate,fill=champ_name))+
+  geom_bar(stat = "identity")+
+  theme(axis.text.x = element_text(angle = 90,hjust=1),
+        axis.text = element_text(size=5))+
+  coord_flip()+
+  viridis::scale_fill_viridis(discrete = TRUE)
+  
+
+
+  
 
 
 

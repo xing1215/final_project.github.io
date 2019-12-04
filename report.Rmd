@@ -1,7 +1,11 @@
 ---
 title: "**Report --- League of Legends Win attributes Analysis**"
 author: "_Lu Chen, Xing Chen, Ziyang Chen, Nankun Liu, Ziyi Zhao_"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
@@ -281,9 +285,7 @@ merge_file =
     golddiff_mean = golddiff_mean/100
   ) %>% 
   select(-diff)
-```
 
-```{r}
 mult_log = merge_file %>% 
   mutate(b_result = factor(b_result)) %>% 
   glm(formula =  b_result ~ outer_mean_diff + golddiff_mean + BARON_NASHOR + DRAGON + RIFT_HERALD + AIR_DRAGON + EARTH_DRAGON + ELDER_DRAGON + WATER_DRAGON + FIRE_DRAGON + kill_diff, family = "binomial")

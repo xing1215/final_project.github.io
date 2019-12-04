@@ -37,14 +37,15 @@ bchamp %>% filter(year==2015,champ_position=="blue_top_champ") %>%
   ungroup(hero_name) %>% 
   mutate(
     hero_name = forcats::fct_reorder(hero_name,win_rate,.desc=FALSE)) %>% 
-  ggplot(aes(x=hero_name,y=win_rate,fill=hero_name))+
-  geom_bar(stat="identity")+
+  ggplot(aes(x=hero_name))+
+  geom_bar(aes(y=win_rate,fill=hero_name),stat="identity")+
   theme(axis.text.x = element_text(angle = 90,hjust=1),
         axis.title = element_text(size = 25,face = "bold"),
         axis.text = element_text(size=15),
         plot.title = element_text(size=26,face = "bold"))+
   coord_flip()+
   viridis::scale_fill_viridis(discrete = TRUE)
+  
 
 ```
 

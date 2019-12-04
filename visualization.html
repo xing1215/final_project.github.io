@@ -354,10 +354,10 @@ div.tocify {
   <a href="visualization.html">EDA</a>
 </li>
 <li>
-  <a href="https://xing1215.shinyapps.io/shiny/">Shiny</a>
+  <a href="https://xing1215.shinyapps.io/shiny/">Champions BPW</a>
 </li>
 <li>
-  <a href=".html">Hero</a>
+  <a href="https://xing1215.shinyapps.io/shiny/#section-winning-rate-simulator">Winning Simulator</a>
 </li>
 <li>
   <a href="report.html">Report</a>
@@ -455,7 +455,7 @@ merge_file %&gt;%
     values_to = &quot;number&quot;
   ) %&gt;% 
   group_by(b_result, neutral_monster) %&gt;% 
-  summarize(number = sum(number, na.rm = TRUE)) %&gt;% 
+  summarise(number = sum(number, na.rm = TRUE)) %&gt;% 
   ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
   geom_bar(stat = &quot;identity&quot;, position = position_dodge()) + 
   coord_flip() + 

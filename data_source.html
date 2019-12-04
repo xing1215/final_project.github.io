@@ -354,10 +354,10 @@ div.tocify {
   <a href="visualization.html">EDA</a>
 </li>
 <li>
-  <a href="https://xing1215.shinyapps.io/shiny/">Shiny</a>
+  <a href="https://xing1215.shinyapps.io/shiny/">Champions BPW</a>
 </li>
 <li>
-  <a href=".html">Hero</a>
+  <a href="https://xing1215.shinyapps.io/shiny/#section-winning-rate-simulator">Winning Simulator</a>
 </li>
 <li>
   <a href="report.html">Report</a>
@@ -460,7 +460,6 @@ div.tocify {
     values_to = &quot;gold&quot;
   ) %&gt;% 
   drop_na()
-
 gold_ave =
   gold %&gt;% 
   group_by(address) %&gt;% 
@@ -487,7 +486,6 @@ gold_ave =
   mutate(
     address = str_remove(address, &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)
   )
-
 monster = 
   monster %&gt;% 
   filter(team %in% c(&quot;bDragons&quot;, &quot;bBarons&quot;, &quot;bHeralds&quot;)) %&gt;% 
@@ -520,7 +518,6 @@ monster[is.na(monster)] = 0</code></pre>
   )</code></pre>
 <p><img src="data_source_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
 <pre class="r"><code>origin_df = read_csv(&quot;./data/LeagueofLegends.csv&quot;) %&gt;% janitor::clean_names()
-
 blank_theme &lt;- theme_minimal() +
   theme(
   axis.title.x = element_blank(),
@@ -554,21 +551,22 @@ origin_df %&gt;%
 </div>
 <div id="read-and-clean-the-kills-data" class="section level2">
 <h2>read and clean the kills data</h2>
-<pre class="r"><code>kills &lt;- read_csv(&quot;./data/kills.csv&quot;) %&gt;% 
+<pre class="r"><code>kills = read_csv(&quot;./data/kills.csv&quot;) %&gt;% 
   janitor::clean_names() %&gt;% 
   mutate(address = str_remove(address,
         &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)) %&gt;%         
   group_by(address,team) %&gt;%
   select(address,team) %&gt;% 
-  summarize(n = n()) %&gt;% 
+  summarise(n = n()) %&gt;% 
   pivot_wider(
     names_from = &quot;team&quot;,
     values_from = &quot;n&quot;) %&gt;%
   mutate(diff = bKills - rKills)
 ## merge kills to merge_file.csv
-merge_file &lt;- left_join(merge_file,kills,by = &quot;address&quot;)
+merge_file = left_join(merge_file,kills,by=&quot;address&quot;)
+
 ## relevel b_results
-merge_file &lt;- merge_file %&gt;% 
+merge_file = merge_file %&gt;% 
   mutate(b_result = relevel(b_result,&quot;lose&quot;))</code></pre>
 <p>do some visualization</p>
 <pre class="r"><code>merge_file %&gt;% ggplot(aes(x = diff,y = b_result)) + 
@@ -584,8 +582,7 @@ merge_file &lt;- merge_file %&gt;%
 <p><img src="data_source_files/figure-html/unnamed-chunk-14-2.png" width="90%" /></p>
 <pre class="r"><code>merge_file %&gt;% ggplot(aes(x = diff,y = b_result)) + 
   geom_point(alpha = 0.5) +
-  stat_smooth(method = &quot;glm&quot;, se = FALSE, fullrange = TRUE, 
-              method.args = list(family = binomial))</code></pre>
+  stat_smooth(method = &quot;glm&quot;, se = FALSE, method.args = list(family = binomial))</code></pre>
 <p><img src="data_source_files/figure-html/unnamed-chunk-14-3.png" width="90%" /></p>
 </div>
 <div id="export-to-csv" class="section level2">

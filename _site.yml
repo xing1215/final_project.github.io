@@ -6,9 +6,9 @@ navbar:
   right:
     - text: "EDA"
       href: visualization.html
-    - text: "Shiny"
+    - text: "Champion Tier"
       href: https://xing1215.shinyapps.io/shiny/
-    - text: "Hero"
+    - text: "Simulator"
       href: .html
     - text: "Report"
       href: report.html

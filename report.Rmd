@@ -1,0 +1,42 @@
+---
+title: "**League of Legends Report**"
+author: "_Lu Chen, Xing Chen, Ziyang Chen, Nankun Liu, Ziyi Zhao_"
+output: html_document
+---
+
+# Motivation and goals
+
+[League of Legends](https://na.leagueoflegends.com/en/game-info/get-started/what-is-lol/) is a fast-paced, competitive online game that blends the speed and intensity of an RTS with RPG elements. Two teams of powerful champions, each with a unique design and playstyle, battle head-to-head across multiple battlefields and game modes. With an ever-expanding roster of champions, frequent updates and a thriving tournament scene, League of Legends offers endless replayability for players of every skill level.
+
+The social impact of League of Legends is huge. The average viewership of 2018 League of Legend World Championship Tournament has reached 46.6million and the viewership peaked in the game IG (Invictus Gaming) vs Fnatic with 205.3 million viewers, according to ESC. As the comparison, 111 million people watched the Super Bowl in 2015.
+
+All of our team members are influenced and attracted by this game. It has become an integral part of our lives. As players, we always want to win. But in reality, we fail very often. So **the goal of this project is to estimate the determinants to win League of Legends, other than personal technologies and team cooperation with these unmeasurable data**.
+
+# Related work
+
+There are many articles out there discussing the "necessary" factors should know to win League of Legands.
+
+* "_Some Factors that Can Guarantee Winning in LoL_" from [BoostRoyal](https://www.boostroyal.com/blog/Some-Factors-that-Can-Guarantee-Winning-in-LoL)
+
+* "_Five Factors that you should know to win League of Legends_" from [InvenGlobal](https://www.invenglobal.com/articles/8188/five-factors-that-you-should-know-to-win-league-of-legends)
+
+* "_League of Legends: Predicting Wins In Champion Select With Machine Learning_" from [Hackernoon](https://hackernoon.com/league-of-legends-predicting-wins-in-champion-select-with-machine-learning-6496523a7ea7)
+
+# Initial questions
+
+Initially, we aimed to predict important elements which determine each League of Legends battle's result only. We intended to deliver our thinkings through modeling and visualization, based on our knowledge obtained in Data Science and Applied Regression classes. Through the process, we developed the interest in figuring out champions with highest wins, picks, bans and rates.
+
+# Data
+
+* Source: we used [League of Legends competitive matches dataset](https://www.kaggle.com/chuckephron/leagueoflegends) to obtain matches data between 2015 to 2018 from [kaggle](https://www.kaggle.com/).
+
+* Scraping method:
+
+* How to clean:
+
+# Exploratory analysis
+
+# Additional analysis
+
+# Discussion
+

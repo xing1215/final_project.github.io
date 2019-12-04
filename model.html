@@ -20,7 +20,11 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
@@ -247,7 +251,67 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
 
 
 
@@ -257,6 +321,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -310,6 +384,14 @@ $(document).ready(function () {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore">Model</h1>
@@ -317,28 +399,212 @@ $(document).ready(function () {
 </div>
 
 
-<div id="r-markdown" class="section level2">
-<h2>R Markdown</h2>
-<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
-<pre class="r"><code>summary(cars)</code></pre>
-<pre><code>##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00</code></pre>
+<pre class="r"><code>merge_file = read_csv(&quot;./data/merge.csv&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   address = col_character(),
+##   year = col_double(),
+##   b_result = col_character(),
+##   bTowers = col_double(),
+##   rTowers = col_double(),
+##   outer_mean_diff = col_double(),
+##   golddiff_mean = col_double(),
+##   BARON_NASHOR = col_double(),
+##   DRAGON = col_double(),
+##   RIFT_HERALD = col_double(),
+##   AIR_DRAGON = col_double(),
+##   EARTH_DRAGON = col_double(),
+##   ELDER_DRAGON = col_double(),
+##   WATER_DRAGON = col_double(),
+##   FIRE_DRAGON = col_double(),
+##   bKills = col_double(),
+##   rKills = col_double(),
+##   diff = col_double()
+## )</code></pre>
+<pre class="r"><code>merge_file =
+  merge_file %&gt;% 
+  mutate(
+    b_result = recode_factor(b_result, &quot;lose&quot; = &quot;0&quot;, &quot;win&quot; = &quot;1&quot;),
+    kill_diff = diff,
+    golddiff_mean = golddiff_mean/100
+  ) %&gt;% 
+  select(-diff)
+
+final_log = merge_file %&gt;% 
+  mutate(b_result = factor(b_result)) %&gt;% 
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR, family = &quot;binomial&quot;)
+ 
+final_log %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.216</td>
+<td align="right">0.100</td>
+<td align="right">-12.217</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">golddiff_mean</td>
+<td align="right">0.101</td>
+<td align="right">0.004</td>
+<td align="right">26.850</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">BARON_NASHOR</td>
+<td align="right">1.191</td>
+<td align="right">0.064</td>
+<td align="right">18.475</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">DRAGON</td>
+<td align="right">0.293</td>
+<td align="right">0.041</td>
+<td align="right">7.151</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">AIR_DRAGON</td>
+<td align="right">0.299</td>
+<td align="right">0.086</td>
+<td align="right">3.476</td>
+<td align="right">0.001</td>
+</tr>
+<tr class="even">
+<td align="left">EARTH_DRAGON</td>
+<td align="right">0.180</td>
+<td align="right">0.077</td>
+<td align="right">2.347</td>
+<td align="right">0.019</td>
+</tr>
+<tr class="odd">
+<td align="left">WATER_DRAGON</td>
+<td align="right">0.199</td>
+<td align="right">0.078</td>
+<td align="right">2.556</td>
+<td align="right">0.011</td>
+</tr>
+<tr class="even">
+<td align="left">FIRE_DRAGON</td>
+<td align="right">0.602</td>
+<td align="right">0.081</td>
+<td align="right">7.419</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">golddiff_mean:BARON_NASHOR</td>
+<td align="right">-0.031</td>
+<td align="right">0.003</td>
+<td align="right">-10.167</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>my_data =
+  merge_file %&gt;% 
+  filter(year != 2014) %&gt;% 
+  #select(-address, -year, -b_result, -bKills, -rKills, -bTowers, -rTowers) %&gt;% #
+  select(outer_mean_diff, golddiff_mean, kill_diff, BARON_NASHOR, AIR_DRAGON, FIRE_DRAGON) %&gt;%
+  rename(
+    tower = &quot;outer_mean_diff&quot;,
+    gold = &quot;golddiff_mean&quot;,
+    kill =&quot;kill_diff&quot;,
+    nashor = &quot;BARON_NASHOR&quot;,
+    air = &quot;AIR_DRAGON&quot;,
+    fire = &quot;FIRE_DRAGON&quot;
+  ) %&gt;% 
+  drop_na()
+
+res &lt;- cor(my_data)
+round(res, 3) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">tower</th>
+<th align="right">gold</th>
+<th align="right">kill</th>
+<th align="right">nashor</th>
+<th align="right">air</th>
+<th align="right">fire</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>tower</td>
+<td align="right">1.000</td>
+<td align="right">-0.374</td>
+<td align="right">-0.105</td>
+<td align="right">-0.040</td>
+<td align="right">-0.083</td>
+<td align="right">-0.024</td>
+</tr>
+<tr class="even">
+<td>gold</td>
+<td align="right">-0.374</td>
+<td align="right">1.000</td>
+<td align="right">0.789</td>
+<td align="right">0.454</td>
+<td align="right">0.155</td>
+<td align="right">0.117</td>
+</tr>
+<tr class="odd">
+<td>kill</td>
+<td align="right">-0.105</td>
+<td align="right">0.789</td>
+<td align="right">1.000</td>
+<td align="right">0.427</td>
+<td align="right">0.104</td>
+<td align="right">0.134</td>
+</tr>
+<tr class="even">
+<td>nashor</td>
+<td align="right">-0.040</td>
+<td align="right">0.454</td>
+<td align="right">0.427</td>
+<td align="right">1.000</td>
+<td align="right">0.116</td>
+<td align="right">0.079</td>
+</tr>
+<tr class="odd">
+<td>air</td>
+<td align="right">-0.083</td>
+<td align="right">0.155</td>
+<td align="right">0.104</td>
+<td align="right">0.116</td>
+<td align="right">1.000</td>
+<td align="right">0.043</td>
+</tr>
+<tr class="even">
+<td>fire</td>
+<td align="right">-0.024</td>
+<td align="right">0.117</td>
+<td align="right">0.134</td>
+<td align="right">0.079</td>
+<td align="right">0.043</td>
+<td align="right">1.000</td>
+</tr>
+</tbody>
+</table>
+
+
+
 </div>
-<div id="including-plots" class="section level2">
-<h2>Including Plots</h2>
-<p>You can also embed plots, for example:</p>
-<p><img src="model_files/figure-html/pressure-1.png" width="672" /></p>
-<p>Note that the <code>echo = FALSE</code> parameter was added to the code chunk to prevent printing of the R code that generated the plot.</p>
 </div>
-
-
-
 
 </div>
 
@@ -370,7 +636,38 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

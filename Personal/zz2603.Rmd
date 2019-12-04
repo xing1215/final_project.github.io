@@ -75,18 +75,44 @@ allchamp %>% filter(year==2015,champ_position=="blue_top_champ") %>%
         axis.text = element_text(size=5))+
   coord_flip()+
   viridis::scale_fill_viridis(discrete = TRUE)
-  
-
-
-  
-
-
 
 ```
 
 # The rate of Hero being banned across years
 
-```{r}
+```{r, fig.height=20,fig.width=25}
+bans = read_csv("./data/bans.csv") %>% janitor::clean_names() %>% 
+  mutate(address = str_remove(address, 
+        "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
+  pivot_longer(ban_1:ban_5,
+               names_to = "bannumber",
+               values_to = "champ_name") %>% 
+  drop_na(champ_name)
+
+year = merge_file %>% select(address,year)
+
+bans = left_join(bans,year,by = "address")
+
+bans %>% filter(year==2015,team=="blueBans") %>% 
+  mutate(champ_name = factor(champ_name),
+         totalgame = dim(.)[1]) %>% 
+  group_by(champ_name) %>% 
+  mutate(totalban = n(),
+         banrate = totalban / totalgame) %>% 
+  ungroup(champ_name) %>% 
+  mutate(champ_name = forcats::fct_reorder(champ_name,banrate)) %>% 
+  ggplot(aes(x=champ_name,y=banrate,fill=champ_name))+
+  geom_bar(stat = "identity")+
+  theme(axis.text.x = element_text(angle = 90,hjust=1),
+        axis.text = element_text(size=15))+
+  coord_flip()+
+  viridis::scale_fill_viridis(discrete = TRUE)
+  
+
+
+
+
+
 
 ```
 

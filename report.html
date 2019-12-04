@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Lu Chen, Xing Chen, Ziyang Chen, Nankun Liu, Ziyi Zhao" />
+
+
+<title>Report — League of Legends Win attributes Analysis</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="visualization.html">EDA</a>
+</li>
+<li>
+  <a href="https://xing1215.shinyapps.io/shiny/">Shiny</a>
+</li>
+<li>
+  <a href=".html">Hero</a>
+</li>
+<li>
+  <a href="report.html">Report</a>
+</li>
+<li>
+  <a href="https://play.na.leagueoflegends.com/en_US">
+    <span class="fas fa fas fa-gamepad fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://github.com/xing1215/final_project.github.io">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore"><strong>Report — League of Legends Win attributes Analysis</strong></h1>
+<h4 class="author"><em>Lu Chen, Xing Chen, Ziyang Chen, Nankun Liu, Ziyi Zhao</em></h4>
+
+</div>
+
+
+<div id="introduction-and-motivation" class="section level1">
+<h1>Introduction and Motivation</h1>
+<p>League of Legends (LoL) is an immensely popular multiplayer online battle arena game, with over 100 million monthly active users worldwide. It hosts progressional competitions throughout the year and had 43 million viewers in the 2016 World Championships alone. For context, that’s more than the 30.8 million viewers that watched Game 7 of the 2016 NBA finals! Published by Riot Games, LOL is clearly fun and addictive once you get started. For those who haven’t, here’s a quick <a href="https://www.youtube.com/watch?v=mxxdeBIwNOs">overview</a> of the game itself.</p>
+<p>Basically, 10 players are divided into 2 teams (blue or red) in the main LoL game (there are 3 modes) after each of them have declared which champion (there are over 100 champions) they are going to play for the match they are in. The objective for each team is to destroy the opposing team’s “Nexus”. Think of the Nexus as the main building in a base camp. Destroy the enemy Nexus and your team wins the game. Protect yours or your team loses the game. Simple enough. However, the collaboration often required between teammates to advance on the enemy Nexus, while defending its own, is wonderfully complex.</p>
+<p>All of our team members love League of Legends so much and this game has become an integral part of our lives. We really enjoy winning the game, though we do not always win. We know the taste of failure very well. So we are very curious about the deteminants of winning the game, other than unmeasurable data such as personal skills and team cooperation. For this project, we focus on analyze game result of blue team(winning on blue team implies losing on red team and vice versa, so only one team is needed to be analyzed).</p>
+</div>
+<div id="related-work-and-inspiration" class="section level1">
+<h1>Related work and inspiration</h1>
+<p>Out of curiosity about how to better win in the game, our group unintentionally saw a report on how to <a href="https://medium.com/trendkite-dev/machine-learning-league-of-legends-victory-predictions-8bc6cbc7754e">use machine learning to predict the winning ratio of League of Legends games</a>. However, this report is too general, and it does not show the data and the detailed operation method in detail. It’s a bit vague for those of us who have little knowledge about machine learning. So we decided to find the data ourselves, and use our knowledge reserves to simply predict the outcome of the game.</p>
+</div>
+<div id="initial-questions" class="section level1">
+<h1>Initial Questions</h1>
+<ul>
+<li><p>Does picking strong champions help blue team to win the game?</p></li>
+<li><p>Does “Pick and Ban(P&amp;B)” affect the result of the game? Are those champions with high win rates always being banned?</p></li>
+<li><p>Does gold difference affect blue team’s result of the game? If it does, on what scale does it affect the result?</p></li>
+<li><p>Does kill affect blue team’s result of the game? If so, how does it affect the result?</p></li>
+<li><p>Does take down towers faster help blue team to win the game?</p></li>
+<li><p>Does slaying netural mosters help blue team to win the game? If so, on what scale does it help to win the game?</p></li>
+</ul>
+</div>
+<div id="data-source-and-data-cleaning" class="section level1">
+<h1>Data Source and Data Cleaning</h1>
+<p>We used <a href="https://www.kaggle.com/chuckephron/leagueoflegends">League of Legends competitive matches dataset</a> to obtain matches data between 2015 to 2018 from <a href="https://www.kaggle.com/">kaggle</a>, a data modeling and data analysis competition platform. The complete data consists of eight different csv files, and each csv file contains different types of data(<code>_columns.csv</code>, <code>bans.csv</code>, <code>gold.csv</code>, <code>kills.csv</code>, <code>matchinfo.csv</code>, <code>monsters.csv</code>, <code>structures.csv</code>, <code>leagueoflegends.csv</code>).</p>
+<p>We first glanced at the information contained in each data. Then filter out the data that is useful to us for processing. There were five factors that we cared about the most — kills, towers, monsters, champions and golds.</p>
+<div id="kill-data-tidy-code" class="section level4">
+<h4>Kill data tidy code</h4>
+<p>Click to see the complete tidy procedures</p>
+<pre class="r"><code>kills &lt;- read_csv(&quot;./data/kills.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  mutate(address = str_remove(address,
+        &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)) %&gt;%         
+  group_by(address,team) %&gt;%
+  select(address,team) %&gt;% 
+  summarize(n = n()) %&gt;% 
+  pivot_wider(
+    names_from = &quot;team&quot;,
+    values_from = &quot;n&quot;) %&gt;%
+  mutate(diff = bKills - rKills)</code></pre>
+<ul>
+<li><strong>Kill</strong> Data of kill are nested in <code>kills.csv</code> file. This file captures the information about unique match id, team id, kill numbers and the time in the game for each kill.</li>
+</ul>
+</div>
+<div id="towers-data-tidy-code" class="section level4">
+<h4>Towers data tidy code</h4>
+<p>Click to see the complete tidy procedures</p>
+<pre class="r"><code>tower = 
+  read_csv(file = &quot;./data/structures.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  filter(type == &quot;OUTER_TURRET&quot;) %&gt;% 
+  mutate(
+    address = str_remove(address, &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)
+  )
+
+tower = 
+  tower %&gt;% 
+  group_by(address, team) %&gt;% 
+  mutate(
+    outer_tower = mean(time, na.rm = TRUE)
+  ) %&gt;% 
+  select(-lane, -time, -type) %&gt;%
+  distinct() %&gt;% 
+  pivot_wider(
+    names_from = team,
+    values_from = outer_tower
+  ) %&gt;% 
+  mutate(outer_mean_diff = bTowers - rTowers)</code></pre>
+<ul>
+<li><strong>Towers</strong> Data of towers are nested in <code>_columns.csv</code> file. This file captures the information about unique match id, team id, tower id and the time in the game for each tower being taken down.</li>
+</ul>
+</div>
+<div id="monsters-data-tidy-code" class="section level4">
+<h4>Monsters data tidy code</h4>
+<p>Click to see the complete tidy procedures</p>
+<pre class="r"><code>monster = 
+  read_csv(&quot;./data/monsters.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  mutate(
+    address = str_remove(address, &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)
+  )
+monster = 
+  monster %&gt;% 
+  filter(team %in% c(&quot;bDragons&quot;, &quot;bBarons&quot;, &quot;bHeralds&quot;)) %&gt;% 
+  group_by(address, type) %&gt;% 
+  summarize(number = n()) %&gt;% 
+  pivot_wider(
+    names_from = type,
+    values_from = number
+  ) 
+monster[is.na(monster)] = 0</code></pre>
+<ul>
+<li><strong>Monsters</strong> Data of monsters are nested in <code>monsters.csv</code> file. This file captures the information about unique match id, team id, monster id, and the number of each monster being slayed. We first imported the <code>monster.csv</code> into R and took a brief look at the data structure and variables using summary() and str() functions. Then, we filtered the data to obtain data only for blue team. After that, we grouped by the unique match id and monster types to summarize for the total number of each type of monsters being slayed for each game. In order to turn each type of monsters into separate variables, we pivoted the data from “long” to “wide”. For those monsters that were not slayed in a game, the data cell that shows the number of slaying is presented by missing value. So, we manually turned these missing values into 0 indicating the certain type of monster has never being killed in a game. Since, for some types of monsters, the more times the monsters being slayed the more benefits will be brought to the team, we decided to treat the monster vairables to be continuous(number being slayed in a game) rather than categorize them(1 if being slayed in a game at least one time, 0 if never being slayed).</li>
+</ul>
+</div>
+<div id="golds-data-tidy-code" class="section level4">
+<h4>Golds data tidy code</h4>
+<p>Click to see the complete tidy procedures</p>
+<pre class="r"><code>gold = 
+  read_csv(file = &quot;./data/gold.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  filter(type == &quot;golddiff&quot;) %&gt;% 
+  mutate(
+    address = str_remove(address, &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)
+  ) %&gt;% 
+  pivot_longer(
+    min_1:min_95,
+    names_to = &quot;min&quot;, 
+    names_prefix = &quot;min_&quot;,
+    values_to = &quot;gold&quot;
+  ) %&gt;% 
+  drop_na()
+gold_ave =
+  gold %&gt;% 
+  group_by(address) %&gt;% 
+  summarize(
+    golddiff_mean = mean(gold)
+  )</code></pre>
+<ul>
+<li><strong>Golds</strong> Data of golds are nested in <code>monsters.csv</code> file. This file captures the information about unique match id, team id, and golds quantity that each team has earned at every minute of a single game.</li>
+<li><strong>Champions</strong> Data of golds are nested in <code>bans.csv</code> file. This file captures the information about unique match id, team id, and the champions being picked and banned of a single game.</li>
+</ul>
+</div>
+<div id="combine-all-datasets" class="section level2">
+<h2>Combine all datasets</h2>
+<p>Click to see the complete tidy procedures</p>
+<pre class="r"><code>leagueoflegends = 
+  read_csv(file = &quot;./data/LeagueofLegends.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  mutate(address = str_remove(address, &quot;http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/&quot;)) %&gt;% 
+  select(address, year, b_result)
+
+merge_file = 
+  left_join(leagueoflegends, tower, by = &quot;address&quot;) %&gt;% 
+  mutate(b_result = recode_factor(b_result, &quot;1&quot; = &quot;win&quot;, &quot;0&quot; = &quot;lose&quot;))
+
+merge_file = left_join(merge_file, monster, by = &quot;address&quot;)
+
+merge_file = left_join(merge_file, gold_ave, by = &quot;address&quot;)
+
+merge_file &lt;- left_join(merge_file,kills,by = &quot;address&quot;)
+## relevel b_results
+merge_file &lt;- merge_file %&gt;% 
+  mutate(b_result = relevel(b_result,&quot;lose&quot;))</code></pre>
+<p>After all the separate datasets were tidied, we combined them into a single integarting dataset called <code>merge_file</code> by left joining all the datasets by unique match id. This final dataset was used for most our later exploratory analyses and statistical analyses.</p>
+</div>
+</div>
+<div id="exploratory-analysis" class="section level1">
+<h1>Exploratory Analysis</h1>
+<p>First, we wanted to see whether take down towers faster help blue team to win the game. The way to win the League of Legends game is to destroy the opponent’s “Nexus base”. However, before reaching the “Nexus base”, your team should take down towers in order to reveal the “Nexus base”. “Nexus base” cannot be attacked before some of the towers have fallen. Also, destroying the tower can bring more money and map control to your side, which is crucial to the win. Hence, We want to know if destroying the towers in a shorter period of time will bring victory to the blue team.</p>
+<div id="fig-1-destroy-towers" class="section level2">
+<h2>Fig 1: Destroy Towers</h2>
+<pre class="r"><code>merge_file %&gt;% 
+  ggplot(aes(x = b_result, y = outer_mean_diff)) + 
+  geom_boxplot() +
+  labs(
+    title = &quot;Fig1: Mean Time Length of Destroying Enemy&#39;s Outter Towers&quot;, 
+    x = &quot;Results of Blue Team&quot;,
+    y = &quot;Mean Time Difference of Destroying Towers&quot;
+  )</code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>In <em>Fig 1</em>,variable <em>outer_mean_diff</em> represents the difference of average time destroying the enemy’s three outer towers between blue and red team (i.e. <em>outer_mean_diff</em> = average time blue team used - average time red team used). And vairable <em>b_result</em>, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expect that the blue team has a greater chance to win the game when the <strong>difference is negative</strong>, meaning the blue team takes less average time to destory the red team’s outer towers.</p>
+<p>Next, we wanted to see if gold difference affect blue team’s result of the game. Gold is the name of money in the game. It enables players to buy powerful equipments for champions they controlled. There are many ways to earn Glod in the game, such as the ones mentioned above: killing, taking down towers and killing netural monsters. A gold lead will give your team a huge game advantage, which will drive your team to victory.</p>
+</div>
+<div id="fig-2-team-golds-differences" class="section level2">
+<h2>Fig 2 Team Golds Differences</h2>
+<pre class="r"><code>merge_file %&gt;% 
+  ggplot(aes(x = b_result, y = golddiff_mean)) + 
+  geom_boxplot() +
+  labs(
+    title = &quot;Fig2: Mean Golds Difference&quot;,
+    x = &quot;Results of Blue Team&quot;, 
+    y = &quot;Mean Gold Difference&quot;
+  )</code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>In <em>Fig 2</em>, variable <em>golddiff_mean</em> represents the average monetary difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has <strong>more golds</strong> than red team in average.</p>
+<p>Next, we wanted to see if slaying netural mosters help blue team to win the game. There are many neutral monsters in the game map. After killing certain monsters, you will get both monetary rewards and additional special effect gains, called buff in the game. Dragon (with 5 different types), Rift Herald and Baron Nashor are the three of the most important monsters.</p>
+</div>
+<div id="fig-3-neutrals-eliminated" class="section level2">
+<h2>Fig 3 Neutrals Eliminated</h2>
+<pre class="r"><code>merge_file %&gt;% 
+  janitor::clean_names() %&gt;% 
+  pivot_longer(
+    baron_nashor:fire_dragon,
+    names_to = &quot;neutral_monster&quot;,
+    values_to = &quot;number&quot;
+  ) %&gt;% 
+  group_by(b_result, neutral_monster) %&gt;% 
+  summarize(number = sum(number, na.rm = TRUE)) %&gt;% 
+  ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
+  geom_bar(stat = &quot;identity&quot;, position = position_dodge()) + 
+  coord_flip() + 
+  labs(
+    title = &quot;Fig3: Numbers and Categories of Killing Neutral Monsters&quot;,
+    x = &quot;Numbers of Kills&quot;,
+    y = &quot;Categories of Neutral Monsters&quot;
+  )</code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>In <em>Fig 3</em>, we try to explore which neutral monsters have a higher effects in contributing to the battle results. The largest difference exists in the kills of <strong>Baron Nashor</strong>.</p>
+<p>Lastly, we wanted to know whether kill affect blue team’s result of the game. Kill is a very important player behavior in League of Legends games. To be more specific, the killing can be interpreted as your controlled player, called champion in this game, kills enemy’s champion or is killed by enemy’s. It just like the Pokémon you used in the Pokémon game, which is defeated by the opponent’s Pokémon. Killing has a huge potential impact on the progress of the game. On the one hand, killing behavior will bring money to your team, so that you have more money to buy powerful equipments to make your champions stronger. On the other hand, killed enemy’s champions will enter resurrection time and they will not be able to act during resurrection time.</p>
+</div>
+<div id="fig-4-team-kills-differences" class="section level2">
+<h2>Fig 4 Team Kills Differences</h2>
+<pre class="r"><code>merge_file %&gt;%  
+  ggplot((aes(x = b_result,y = diff,group = b_result))) +
+  geom_boxplot() +
+  labs(
+    title = &quot;Fig4: Mean Killing Difference&quot;,
+    x = &quot;Results of Blue Team&quot;,
+    y = &quot;Mean Killing Difference&quot;
+  )</code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>In <em>Fig 4</em>,variable <em>diff</em> represents the average kill difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has <strong>more kills</strong> than red team in average.</p>
+<div id="shiny-and-flex-dashboard" class="section level6">
+<h6>Shiny and flex dashboard</h6>
+<p>需要展示shiny和dashboard</p>
+</div>
+</div>
+</div>
+<div id="statistical-analysis" class="section level1">
+<h1>Statistical Analysis</h1>
+<p>We used logistic regression model to predict the log odds of win of blue team by including covariates that entailed the data for kill, towers, monsters and golds. At first, we used the original mean gold difference data value to perform the logistic model. Nontheless, mean gold differences are usually very large for most of the games like 10 thousands or even 20 thousands golds. On that account, each 1 unit of gold difference would barely contribute to predict the log odds of win and the parameter estimate of variable gold difference is very low, though significant. Thus, we further decided to divided the gold difference data by 100 to make it a 100-unit increment.</p>
+<pre class="r"><code>merge_file =
+  merge_file %&gt;% 
+  mutate(
+    b_result = recode_factor(b_result, &quot;lose&quot; = &quot;0&quot;, &quot;win&quot; = &quot;1&quot;),
+    kill_diff = diff,
+    golddiff_mean = golddiff_mean/100
+  ) %&gt;% 
+  select(-diff)</code></pre>
+<pre class="r"><code>mult_log = merge_file %&gt;% 
+  mutate(b_result = factor(b_result)) %&gt;% 
+  glm(formula =  b_result ~ outer_mean_diff + golddiff_mean + BARON_NASHOR + DRAGON + RIFT_HERALD + AIR_DRAGON + EARTH_DRAGON + ELDER_DRAGON + WATER_DRAGON + FIRE_DRAGON + kill_diff, family = &quot;binomial&quot;)
+ 
+mult_log %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.427</td>
+<td align="right">0.160</td>
+<td align="right">-8.907</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">outer_mean_diff</td>
+<td align="right">0.015</td>
+<td align="right">0.012</td>
+<td align="right">1.291</td>
+<td align="right">0.197</td>
+</tr>
+<tr class="odd">
+<td align="left">golddiff_mean</td>
+<td align="right">0.009</td>
+<td align="right">0.004</td>
+<td align="right">2.143</td>
+<td align="right">0.032</td>
+</tr>
+<tr class="even">
+<td align="left">BARON_NASHOR</td>
+<td align="right">1.017</td>
+<td align="right">0.091</td>
+<td align="right">11.226</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">DRAGON</td>
+<td align="right">0.331</td>
+<td align="right">0.059</td>
+<td align="right">5.571</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">RIFT_HERALD</td>
+<td align="right">-0.022</td>
+<td align="right">0.115</td>
+<td align="right">-0.187</td>
+<td align="right">0.852</td>
+</tr>
+<tr class="odd">
+<td align="left">AIR_DRAGON</td>
+<td align="right">0.579</td>
+<td align="right">0.132</td>
+<td align="right">4.394</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">EARTH_DRAGON</td>
+<td align="right">0.201</td>
+<td align="right">0.112</td>
+<td align="right">1.788</td>
+<td align="right">0.074</td>
+</tr>
+<tr class="odd">
+<td align="left">ELDER_DRAGON</td>
+<td align="right">0.133</td>
+<td align="right">0.145</td>
+<td align="right">0.916</td>
+<td align="right">0.359</td>
+</tr>
+<tr class="even">
+<td align="left">WATER_DRAGON</td>
+<td align="right">0.267</td>
+<td align="right">0.113</td>
+<td align="right">2.364</td>
+<td align="right">0.018</td>
+</tr>
+<tr class="odd">
+<td align="left">FIRE_DRAGON</td>
+<td align="right">0.445</td>
+<td align="right">0.116</td>
+<td align="right">3.843</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">kill_diff</td>
+<td align="right">0.459</td>
+<td align="right">0.017</td>
+<td align="right">27.664</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
+<p>From the model we saw that gold lead for blue team did help them to win the game. For each 100 golds lead, the log odds of blue team winning the game increases by 0.9%. If the blue team has gold lead by 10 thousands golds, the log odds of winning will increase by 90%!</p>
+<p>Also, slaying monsters help blue team to win the game in a large extent. The most prominent effect is slaying Baron Nashor which is the thoughest monster in the game. As long as 1 Baron Nashor is slayed by blue team, the log odds of winning will be doubled!</p>
+<p>Moreover, kills contributes to the victory of blue team a lot. During a game, if the total kills number of blue team is greater than that of the red team for merely 1, the log odds of winning of blue team increases by 45.9%. Hence, kills more champions than does the opponent team helps to win the game in general.</p>
+<p>However, the result shown by the <code>outer_mean_diff</code> variable, which represents the mean time difference in minute of destroying all the outer towers between blue team and red team, did not come out as we expected. From the exploratory analysis, we saw that the if the blue team destroys the outer towers faster than red team, they had a higher chance to win. Note that faster means the time difference between blue team destroying the outer towers and red team destroying the outer towers should be a negative value. Nonetheless, the positive parameter estimate from the model tells that if blue team is faster(with negative time difference), the log odds of blue team winning the game will decrease. Needless to say that this variable is statistically non-significant in the model. Therefore, we want to further investigate the relationship between towers and the game result of blue team.</p>
+<p>We first fitted a univariate logistic model with only <code>outer_mean_diff</code> as predictor.</p>
+<pre class="r"><code>tow_log = merge_file %&gt;% 
+  mutate(b_result = factor(b_result)) %&gt;% 
+  glm(formula =  b_result ~ outer_mean_diff, family = &quot;binomial&quot;)
+ 
+tow_log %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.107</td>
+<td align="right">0.024</td>
+<td align="right">4.369</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">outer_mean_diff</td>
+<td align="right">-0.048</td>
+<td align="right">0.004</td>
+<td align="right">-11.472</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>The negative parameter estimate is consistent with our exploratory analysis that if the blue team destroys the outer towers faster than red team, they had a higher chance to win.</p>
+<pre class="r"><code>tow_gold_log = merge_file %&gt;% 
+  mutate(b_result = factor(b_result)) %&gt;% 
+  glm(formula =  b_result ~ outer_mean_diff + golddiff_mean, family = &quot;binomial&quot;)
+ 
+tow_gold_log %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.187</td>
+<td align="right">0.040</td>
+<td align="right">4.696</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">outer_mean_diff</td>
+<td align="right">0.150</td>
+<td align="right">0.008</td>
+<td align="right">19.878</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">golddiff_mean</td>
+<td align="right">0.112</td>
+<td align="right">0.003</td>
+<td align="right">43.023</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>However, when we built another model with covariates <code>outer_mean_diff</code> and <code>golddiff_mean</code>, the sign of parameter estimate of <code>outer_mean_diff</code> flipped to be positive which was the same as our first full model that contains all variables. Hence, we thought that the true effect of destroying outer towers on the result of the game in fact comes from the golds that blue team earns by destroying the outer towers. This is to say that the behavior of destroying the outer towers faster doesn’t directly increase the odds of winning the game, but the golds earned by destroying the outer towers lead blue team to have a higher chance to win.</p>
+</div>
+<div id="additional-analysis" class="section level1">
+<h1>Additional Analysis</h1>
+<p>说一下correlation</p>
+</div>
+<div id="discussion" class="section level1">
+<h1>Discussion</h1>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -20,35 +20,39 @@ library(patchwork)
 
 
 ```{r}
+# data cleaning
 merge = 
   read_csv(file = "./data/merge.csv") %>% 
   janitor::clean_names() %>% 
+  filter(year != 2014) %>% 
   mutate(
-    year = recode_factor(year, "2014" = "S4", "2015" = "S5", "2016" = "S6", "2017" = "S7", "2018" = "S8"), 
-    year = fct_relevel(year, "S4", "S5", "S6", "S7", "S8")
+    year = recode_factor(year, "2015" = "S5", "2016" = "S6", "2017" = "S7", "2018" = "S8"), 
+    year = fct_relevel(year, "S5", "S6", "S7", "S8")
   )
 
 origin_df = 
   read_csv("./data/LeagueofLegends.csv") %>% 
   janitor::clean_names() %>% 
+  filter(year != 2014) %>% 
   mutate(
-    year = recode_factor(year, "2014" = "S4", "2015" = "S5", "2016" = "S6", "2017" = "S7", "2018" = "S8"), 
-    year = fct_relevel(year, "S4", "S5", "S6", "S7", "S8")
+    year = recode_factor(year, "2015" = "S5", "2016" = "S6", "2017" = "S7", "2018" = "S8"), 
+    year = fct_relevel(year, "S5", "S6", "S7", "S8")
   )
 
-blank_theme <- theme_minimal() +
-  theme(
-  axis.title.x = element_blank(),
-  axis.title.y = element_blank(),
-  panel.border = element_blank(),
-  panel.grid = element_blank(),
-  axis.ticks = element_blank(),
-  plot.title = element_text(size = 14, face = "bold")
-)
+match_df = 
+  read_csv("./data/matchinfo.csv") %>% 
+  janitor::clean_names() %>% 
+  filter(year != 2014) %>% 
+  mutate(
+    year = recode_factor(year, "2015" = "S5", "2016" = "S6", "2017" = "S7", "2018" = "S8"), 
+    year = fct_relevel(year, "S5", "S6", "S7", "S8")
+  )
 
 # rsconnect::deployApp('/Users/xingchen/Desktop/Data Science/final_project/final_project.github.io/shiny')
 ```
 
+Page1
+==============================
 
 Column {.sidebar}
 -----------------------------------------------------------------------
@@ -60,13 +64,31 @@ year =
   pull()
 
 # selectInput widget, something like a dropdown menu
-
 selectInput(
   "year_choice", 
   label = h3("Select year"),
   choices = year, 
   selected = "S8"
 )
+
+position = 
+  match_df %>% 
+  select(year, starts_with("blue_")) %>% 
+  pivot_longer(
+    cols =  c(blue_top_champ, blue_jungle_champ, blue_middle_champ, 
+              blue_adc_champ, blue_support_champ),
+    names_to = "champ_types",
+    values_to = "champ_names",
+    names_prefix = "blue_"
+  ) %>% 
+  mutate(champ_types = str_remove(champ_types, "_champ")) %>% 
+  distinct(champ_types) %>% pull()
+  
+# radioButtons widget
+radioButtons(
+  "position_choice", 
+  label = h3("select position"),
+  choices = position, selected = "adc")
 ```
 
 Column {data-width=650}
@@ -76,15 +98,35 @@ Column {data-width=650}
 
 ```{r}
 renderPlotly({
-  merge %>% 
-    filter(year == input[["year_choice"]]) %>% 
-    ggplot(aes(x = b_result, y = outer_mean_diff)) + 
-    geom_boxplot() +
-    labs(
-      title = "Fig1: time length of destroying enemy's towers vs. battle reuslts", 
-      x = "results of blue team",
-      y = "mean time difference of destroying towers"
-    )
+  match_df %>% 
+    select(address,year,b_result,blue_top_champ,blue_jungle_champ,
+           blue_middle_champ,blue_adc_champ,blue_support_champ) %>%
+    mutate(address = str_remove(address,
+          "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>% 
+    pivot_longer(
+      blue_top_champ:blue_support_champ,
+      names_to = "champ_position",
+      values_to = "champ_name", 
+      names_prefix = "blue_") %>% 
+    mutate(champ_position = str_remove(champ_position, "_champ")) %>% 
+    filter(year == input[["year_choice"]],champ_position == input[["position_choice"]]) %>% 
+    mutate(hero_name = as.factor(champ_name)) %>% 
+    group_by(hero_name) %>% 
+    mutate(total = n()) %>% 
+    filter(b_result == 1) %>% 
+    mutate(nwin = n(),
+           win_rate = nwin/total) %>% 
+    ungroup(hero_name) %>% 
+    mutate(
+      hero_name = forcats::fct_reorder(hero_name,win_rate,.desc = FALSE)) %>% 
+    ggplot(aes(x = hero_name,y = win_rate,fill = hero_name)) +
+    geom_bar(stat = "identity") +
+    theme(axis.text.x = element_text(angle = 90,hjust = 1),
+          axis.title = element_text(size = 25,face = "bold"),
+          axis.text = element_text(size = 15),
+          plot.title = element_text(size = 26,face = "bold")) +
+    coord_flip() +
+    viridis::scale_fill_viridis(discrete = TRUE)
 })
 ```
 
@@ -102,4 +144,91 @@ Column {data-width=350}
 ```{r}
 
 ```
+
+
+Probability of Winning the game
+===================================== 
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+# sliderInput widget of gold diff
+min_gold_diff = -9000
+max_gold_diff = 9000
+
+sliderInput(
+  "gold_range", 
+  label = h3("Gold difference"), 
+  min = min_gold_diff, max = max_gold_diff, value = 0)
+
+# sliderInput widget of baron nashor
+min_baron_nashor = 0
+max_baron_nashor = merge %>% drop_na(baron_nashor) %>% distinct(baron_nashor) %>% max()
+
+sliderInput(
+  "baron_nashor",
+  label = h3("Number of baron nashor"),
+  min = min_baron_nashor, max = max_baron_nashor, value = 0)
+
+# sliderInput widget of dragon
+min_dragon = 0
+max_dragon = merge %>% drop_na(dragon) %>% distinct(dragon) %>% max()
+
+sliderInput(
+  "dragon",
+  label = h3("Number of dragon (applied only before S6)"),
+  min = min_dragon, max = max_dragon, value = 0)
+
+# sliderInput widget of air dragon
+min_air_dragon = 0
+max_air_dragon = merge %>% drop_na(air_dragon) %>% distinct(air_dragon) %>% max()
+
+sliderInput(
+  "air_dragon",
+  label = h3("Number of air dragon"),
+  min = min_air_dragon, max = max_air_dragon, value = 0)
+
+# sliderInput widget of earth dragon
+min_earth_dragon = 0
+max_earth_dragon = merge %>% drop_na(earth_dragon) %>% distinct(earth_dragon) %>% max()
+
+sliderInput(
+  "earth_dragon",
+  label = h3("Number of earth dragon"),
+  min = min_earth_dragon, max = max_earth_dragon, value = 0)
+
+# sliderInput widget of water dragon
+min_water_dragon = 0
+max_water_dragon = merge %>% drop_na(water_dragon) %>% distinct(water_dragon) %>% max()
+
+sliderInput(
+  "water_dragon",
+  label = h3("Number of water dragon"),
+  min = min_water_dragon, max = max_water_dragon, value = 0)
+
+# sliderInput widget of fire dragon
+min_fire_dragon = 0
+max_fire_dragon = merge %>% drop_na(fire_dragon) %>% distinct(fire_dragon) %>% max()
+
+sliderInput(
+  "fire_dragon",
+  label = h3("Number of fire dragon"),
+  min = min_fire_dragon, max = max_fire_dragon, value = 0)
+```
+
+Column {.tabset}
+-----------------------------------------------------------------------
+
+```{r}
+renderPrint({
+  p = exp(-1.237 + 0.00075*input[["gold_range"]] + 1.192*input[["baron_nashor"]] + 0.299*input[["dragon"]] + 0.288*input[["air_dragon"]] + 0.152*input[["earth_dragon"]] + 0.203*input[["water_dragon"]] + 0.606*input[["fire_dragon"]]) / 
+    (1 + exp(-1.237 + 0.00075*input[["gold_range"]] + 1.192*input[["baron_nashor"]] + 0.299*input[["dragon"]] + 0.288*input[["air_dragon"]] + 0.152*input[["earth_dragon"]] + 0.203*input[["water_dragon"]] + 0.606*input[["fire_dragon"]]))
+  p = p * 100
+  prob = p %>% round(digits = 2) %>% paste("%") %>% as.character()
+  prob = str_c("Your winning probability is ", prob)
+  prob
+})
+```
+
 

@@ -6,10 +6,12 @@ navbar:
   right:
     - text: "EDA"
       href: visualization.html
-    - text: "Shiny"
+    - text: "Model"
+      href: model.html    
+    - text: "Champions BPW"
       href: https://xing1215.shinyapps.io/shiny/
-    - text: "Hero"
-      href: .html
+    - text: "Winning Simulator"
+      href: https://xing1215.shinyapps.io/shiny/#section-winning-rate-simulator
     - text: "Report"
       href: report.html
     - icon: fas fa-gamepad fa-lg

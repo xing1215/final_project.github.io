@@ -13,7 +13,6 @@ library(readr)
 library(scales)
 library(ggridges)
 library(patchwork)
-
 knitr::opts_chunk$set(
 	echo = TRUE,
 	warning = FALSE,
@@ -112,7 +111,6 @@ gold =
     values_to = "gold"
   ) %>% 
   drop_na()
-
 gold_ave =
   gold %>% 
   group_by(address) %>% 
@@ -148,7 +146,6 @@ monster =
   mutate(
     address = str_remove(address, "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")
   )
-
 monster = 
   monster %>% 
   filter(team %in% c("bDragons", "bBarons", "bHeralds")) %>% 
@@ -191,7 +188,6 @@ merge_file %>%
 
 ```{r,message=FALSE, warning=FALSE}
 origin_df = read_csv("./data/LeagueofLegends.csv") %>% janitor::clean_names()
-
 blank_theme <- theme_minimal() +
   theme(
   axis.title.x = element_blank(),
@@ -233,21 +229,17 @@ kills = read_csv("./data/kills.csv") %>%
         "http://matchhistory.na.leagueoflegends.com/en/#match-details/TRLH1/")) %>%         
   group_by(address,team) %>%
   select(address,team) %>% 
-  summarize(n = n()) %>% 
+  summarise(n = n()) %>% 
   pivot_wider(
     names_from = "team",
     values_from = "n") %>%
   mutate(diff = bKills - rKills)
 ## merge kills to merge_file.csv
-<<<<<<< HEAD
 merge_file = left_join(merge_file,kills,by="address")
-=======
-merge_file <- left_join(merge_file,kills,by = "address")
->>>>>>> 8e1e2b71cd779937deb16f919930cd14aa97f199
+
 ## relevel b_results
 merge_file = merge_file %>% 
   mutate(b_result = relevel(b_result,"lose"))
-
 ```
 
 do some visualization
@@ -255,20 +247,14 @@ do some visualization
 ```{r,message=FALSE, warning=FALSE}
 merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point()
-
 merge_file %>%  ggplot((aes(x = b_result,y = diff,group = b_result))) +
-<<<<<<< HEAD
-  geom_violin() +
-  coord_flip()
-=======
   geom_boxplot() +
   labs(
     title = "Fig4: the mean killing difference vs. battle result",
     x = "results of blue team",
     y = "mean killing difference"
   )
-
->>>>>>> 8e1e2b71cd779937deb16f919930cd14aa97f199
+  
 merge_file %>% ggplot(aes(x = diff,y = b_result)) + 
   geom_point(alpha = 0.5) +
   stat_smooth(method = "glm", se = FALSE, method.args = list(family = binomial))
@@ -279,12 +265,3 @@ merge_file %>% ggplot(aes(x = diff,y = b_result)) +
 ```{r}
 write.csv(merge_file,"./data/merge.csv", row.names = FALSE)
 ```
-
-
-
-
-
-
-
-
-

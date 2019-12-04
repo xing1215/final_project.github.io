@@ -1,7 +1,11 @@
 ---
 title: "**Report --- League of Legends Win attributes Analysis**"
 author: "_Lu Chen, Xing Chen, Ziyang Chen, Nankun Liu, Ziyi Zhao_"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
@@ -64,7 +68,7 @@ kills = read_csv("./data/kills.csv") %>%
   mutate(diff = bKills - rKills)
 ```
 * **Kill**
-Data of kill are nested in `kills.csv` file. This file captures the information about unique match id, team id, kill numbers and the time in the game for each kill.
+Data of kill are nested in `kills.csv` file. This file captures the information about unique match id, team id, kill numbers and the time in the game for each kill. We firstly used str() to look at variables and structure and find out that the dataset is in a longer format, because kills from red and blue teams are put in one variable 'team'. We used pivot_wider() to separate kill into two variables by teams. Then, we summarise two variable and acquired the number of kills each game for two teams. We use number of kills by blue team to substract the number of kills by red team, and create a new variable for the difference in number of kill between blue and red team.    
 
 #### Towers data tidy code
 
@@ -281,9 +285,7 @@ merge_file =
     golddiff_mean = golddiff_mean/100
   ) %>% 
   select(-diff)
-```
 
-```{r}
 mult_log = merge_file %>% 
   mutate(b_result = factor(b_result)) %>% 
   glm(formula =  b_result ~ outer_mean_diff + golddiff_mean + BARON_NASHOR + DRAGON + RIFT_HERALD + AIR_DRAGON + EARTH_DRAGON + ELDER_DRAGON + WATER_DRAGON + FIRE_DRAGON + kill_diff, family = "binomial")

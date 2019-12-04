@@ -77,7 +77,7 @@ merge_file %>%
     values_to = "number"
   ) %>% 
   group_by(b_result, neutral_monster) %>% 
-  summarize(number = sum(number, na.rm = TRUE)) %>% 
+  summarise(number = sum(number, na.rm = TRUE)) %>% 
   ggplot(aes(x = neutral_monster, y = number, fill = b_result)) + 
   geom_bar(stat = "identity", position = position_dodge()) + 
   coord_flip() + 

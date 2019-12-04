@@ -6,6 +6,8 @@ navbar:
   right:
     - text: "EDA"
       href: visualization.html
+    - text: "Model"
+      href: model.html    
     - text: "Champions BPW"
       href: https://xing1215.shinyapps.io/shiny/
     - text: "Winning Simulator"

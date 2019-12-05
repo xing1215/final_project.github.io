@@ -359,14 +359,14 @@ We saw that the correaltion between golds and kills was 0.789. This correlation 
 ```{r}
 final_log = merge_file %>% 
   mutate(b_result = factor(b_result)) %>% 
-  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + kill_diff + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR + golddiff_mean:kill_diff, family = "binomial")
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR, family = "binomial")
  
 final_log %>% 
   broom::tidy() %>% 
   knitr::kable(digits = 3)
 ```
 
-Amongst two of the interaction terms, the interaction bewteen `golddiff_mean` and `BARON_NASHOR` was significant while the interaction bewteen `golddiff_mean` and `kill_diff` was not. One thing needed to be noted here was that the coefficient of the interaction bewteen `golddiff_mean` and `BARON_NASHOR` was negative. This indicated that if blue team had both gold lead and had taken down baron nashor, the two things togther made the increament in the odds of winning by blue team less.
+In the final model, we decided to take out mean kill different and mean outer tower take down time, the former was due to a high correlation with gold, while the latter was analyzed separately because of no statistically significance. The interaction bewteen `golddiff_mean` and `BARON_NASHOR` was significant. And one thing needed to be noted here was that the coefficient of the interaction bewteen `golddiff_mean` and `BARON_NASHOR` was negative. This indicated that if blue team had both gold lead and had taken down baron nashor, the two things togther made the increament in the odds of winning by blue team less.
 
 # Discussion
 

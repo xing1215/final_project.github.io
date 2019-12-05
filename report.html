@@ -558,7 +558,7 @@ merge_file &lt;- merge_file %&gt;%
     y = &quot;Mean Time Difference of Destroying Towers&quot;
   )</code></pre>
 <p><img src="report_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<p>In <em>Fig 1</em>,variable <em>outer_mean_diff</em> represents the difference of average time destroying the enemy’s three outer towers between blue and red team (i.e. <em>outer_mean_diff</em> = average time blue team used - average time red team used). And vairable <em>b_result</em>, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expected that the blue team has a greater chance to win the game when the <strong>difference is negative</strong>, meaning the blue team takes less average time to destory the red team’s outer towers.</p>
+<p>In <em>Fig 1</em>,variable <em>outer_mean_diff</em> represents the difference of average time destroying the enemy’s three outer towers between blue and red team (i.e. <em>outer_mean_diff</em> = average time blue team used - average time red team used). And vairable <em>b_result</em>, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expected that the blue team has a greater chance to win the game when the <strong>difference is negative</strong>, meaning the blue team takes less average time to destory the red team’s outer towers.</p>
 <p>Next, we wanted to see if gold difference affects the game result for the blue team. Gold is the name of money in the game. It enables players to buy powerful equipments for champions they controlled. There are many ways to earn Gold in the game, such as the ones mentioned above: killing, taking down towers and killing netural monsters. A gold lead will give your team a huge game advantage, which will drive your team to victory.</p>
 </div>
 <div id="fig-2-team-golds-differences" class="section level2">
@@ -908,7 +908,7 @@ round(res, 3) %&gt;%
 <p>We saw that the correaltion between golds and kills was 0.789. This correlation value was very high in respective to other variables. The finding convinced us that a large part of effect from variable <code>kill_diff</code> can in fact be explained by the effect from <code>golddiff_mean</code>. On this account, we suspected that the effect of other variables on the blue team’s result of a game might be modified by the effect of gold difference. So we tried adding interaction terms into our full model. Specifically, we made <code>golddiff_mean</code> to interact with only <code>kill_diff</code> and all the monsters variable <code>Baron_Nashor</code>. The reason we did so was that these two variables had the largest effect size and were significant under the full model.</p>
 <pre class="r"><code>final_log = merge_file %&gt;% 
   mutate(b_result = factor(b_result)) %&gt;% 
-  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + kill_diff + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR + golddiff_mean:kill_diff, family = &quot;binomial&quot;)
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR, family = &quot;binomial&quot;)
  
 final_log %&gt;% 
   broom::tidy() %&gt;% 
@@ -926,84 +926,70 @@ final_log %&gt;%
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">-1.465</td>
-<td align="right">0.154</td>
-<td align="right">-9.522</td>
+<td align="right">-1.216</td>
+<td align="right">0.100</td>
+<td align="right">-12.217</td>
 <td align="right">0.000</td>
 </tr>
 <tr class="even">
 <td align="left">golddiff_mean</td>
-<td align="right">0.021</td>
-<td align="right">0.005</td>
-<td align="right">4.327</td>
+<td align="right">0.101</td>
+<td align="right">0.004</td>
+<td align="right">26.850</td>
 <td align="right">0.000</td>
 </tr>
 <tr class="odd">
 <td align="left">BARON_NASHOR</td>
-<td align="right">1.117</td>
-<td align="right">0.087</td>
-<td align="right">12.802</td>
+<td align="right">1.191</td>
+<td align="right">0.064</td>
+<td align="right">18.475</td>
 <td align="right">0.000</td>
 </tr>
 <tr class="even">
-<td align="left">kill_diff</td>
-<td align="right">0.457</td>
-<td align="right">0.016</td>
-<td align="right">28.227</td>
-<td align="right">0.000</td>
-</tr>
-<tr class="odd">
 <td align="left">DRAGON</td>
-<td align="right">0.305</td>
-<td align="right">0.059</td>
-<td align="right">5.215</td>
+<td align="right">0.293</td>
+<td align="right">0.041</td>
+<td align="right">7.151</td>
 <td align="right">0.000</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">AIR_DRAGON</td>
-<td align="right">0.610</td>
-<td align="right">0.130</td>
-<td align="right">4.676</td>
-<td align="right">0.000</td>
+<td align="right">0.299</td>
+<td align="right">0.086</td>
+<td align="right">3.476</td>
+<td align="right">0.001</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">EARTH_DRAGON</td>
-<td align="right">0.214</td>
-<td align="right">0.112</td>
-<td align="right">1.911</td>
-<td align="right">0.056</td>
+<td align="right">0.180</td>
+<td align="right">0.077</td>
+<td align="right">2.347</td>
+<td align="right">0.019</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">WATER_DRAGON</td>
-<td align="right">0.252</td>
-<td align="right">0.113</td>
-<td align="right">2.233</td>
-<td align="right">0.026</td>
-</tr>
-<tr class="odd">
-<td align="left">FIRE_DRAGON</td>
-<td align="right">0.420</td>
-<td align="right">0.116</td>
-<td align="right">3.612</td>
-<td align="right">0.000</td>
+<td align="right">0.199</td>
+<td align="right">0.078</td>
+<td align="right">2.556</td>
+<td align="right">0.011</td>
 </tr>
 <tr class="even">
-<td align="left">golddiff_mean:BARON_NASHOR</td>
-<td align="right">-0.015</td>
-<td align="right">0.004</td>
-<td align="right">-4.069</td>
+<td align="left">FIRE_DRAGON</td>
+<td align="right">0.602</td>
+<td align="right">0.081</td>
+<td align="right">7.419</td>
 <td align="right">0.000</td>
 </tr>
 <tr class="odd">
-<td align="left">golddiff_mean:kill_diff</td>
-<td align="right">0.001</td>
-<td align="right">0.001</td>
-<td align="right">2.106</td>
-<td align="right">0.035</td>
+<td align="left">golddiff_mean:BARON_NASHOR</td>
+<td align="right">-0.031</td>
+<td align="right">0.003</td>
+<td align="right">-10.167</td>
+<td align="right">0.000</td>
 </tr>
 </tbody>
 </table>
-<p>Amongst two of the interaction terms, the interaction bewteen <code>golddiff_mean</code> and <code>BARON_NASHOR</code> was significant while the interaction bewteen <code>golddiff_mean</code> and <code>kill_diff</code> was not. One thing needed to be noted here was that the coefficient of the interaction bewteen <code>golddiff_mean</code> and <code>BARON_NASHOR</code> was negative. This indicated that if blue team had both gold lead and had taken down baron nashor, the two things togther made the increament in the odds of winning by blue team less.</p>
+<p>In the final model, we decided to take out mean kill different and mean outer tower take down time, the former was due to a high correlation with gold, while the latter was analyzed separately because of no statistically significance. The interaction bewteen <code>golddiff_mean</code> and <code>BARON_NASHOR</code> was significant. And one thing needed to be noted here was that the coefficient of the interaction bewteen <code>golddiff_mean</code> and <code>BARON_NASHOR</code> was negative. This indicated that if blue team had both gold lead and had taken down baron nashor, the two things togther made the increament in the odds of winning by blue team less.</p>
 </div>
 <div id="discussion" class="section level1">
 <h1>Discussion</h1>

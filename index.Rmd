@@ -8,6 +8,7 @@ output:
 ---
 
 <img src="lol.png" style="width:90%">
+![](ee45b2981888bc8d7003d4bcb43f3ee1.png)
 
 # Introduction
 

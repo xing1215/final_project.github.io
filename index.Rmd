@@ -17,6 +17,15 @@ League of Legends (LoL) is an immensely popular multiplayer online battle arena 
 
 <img src="map.png" style="width:80%">
 
+# Screencast
+```{r echo = FALSE}
+library(vembedr)
+```
+
+```{r echo=FALSE, message = FALSE, warning=FALSE}
+embed_url("https://www.youtube.com/watch?v=q3D5-t2vo64")
+```
+
 # Motivation
 
 All of our team members love League of Legends so much and this game has become an integral part of our lives. We really enjoy winning the game, but we are not always win. We know the taste of failure very well. So we are very curious about the deteminants of winning the game, other than those unmeasurable data like personal skills and cooperation.

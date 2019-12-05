@@ -75,7 +75,7 @@ res2 = Hmisc::rcorr(as.matrix(my_data))
 res2[1] %>% knitr::kable(digits = 3) ## correlation r
 res2[3] %>% knitr::kable(digits = 3) ## p-value
 
-
+res %>% corrplot::corrplot() ## create plot to show the correlation 
 
 
 

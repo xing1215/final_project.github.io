@@ -70,6 +70,15 @@ my_data =
 res <- cor(my_data)
 round(res, 3) %>% 
   knitr::kable()
+
+res2 = Hmisc::rcorr(as.matrix(my_data))
+res2[1] %>% knitr::kable(digits = 3) ## correlation r
+res2[3] %>% knitr::kable(digits = 3) ## p-value
+
+
+
+
+
 ```
 
 **Result**

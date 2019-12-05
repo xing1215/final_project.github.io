@@ -270,7 +270,9 @@ In *Fig 4*,variable *diff* represents the average kill difference in every minut
 
 ###### Shiny and flex dashboard
 
-需要展示shiny和dashboard
+[Shiny](https://xing1215.shinyapps.io/shiny/)
+
+We provide some interesting information about this game. You could check ban rate, pick rate, and win rate of each champion across each year. We also provide a tool to calculate the winning rate of your team with some variable input. Have fun with it!
 
 # Statistical Analysis
 

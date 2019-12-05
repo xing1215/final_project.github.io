@@ -12,7 +12,7 @@
 
 
 
-<title>League of Legends Prediction</title>
+<title>Model</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -24,6 +24,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
@@ -250,6 +251,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -380,56 +384,222 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
 
 
-<h1 class="title toc-ignore">League of Legends Prediction</h1>
+
+<h1 class="title toc-ignore">Model</h1>
 
 </div>
 
 
-<p><img src="lol.png" style="width:70%"></p>
-<div id="introduction" class="section level1">
-<h1>Introduction</h1>
-<p>League of Legends (LoL) is an immensely popular multiplayer online battle arena game, with over 100 million monthly active users worldwide. It hosts progressional competitions throughout the year and had 43 million viewers in the 2016 World Championships alone. For context, that’s more than the 30.8 million viewers that watched Game 7 of the 2016 NBA finals! Published by Riot Games, LOL is clearly fun and addictive once you get started. For those who haven’t, here’s a quick overview of the game itself.</p>
-<p>10 players are divided into 2 teams (blue or red) in the main LoL game (there are 3 modes). The objective for each team is to destroy the opposing team’s “Nexus”. Think of the Nexus as the main building in a base camp. Destroy the enemy Nexus and your team wins the game. Protect yours or your team loses the game. Simple enough. However, the collaboration often required between teammates to advance on the enemy Nexus, while defending its own, is wonderfully complex.</p>
-<p><img src="map.png" style="width:80%"></p>
-</div>
-<div id="motivation" class="section level1">
-<h1>Motivation</h1>
-<p>All of our team members love League of Legends so much and this game has become an integral part of our lives. We really enjoy winning the game, but we are not always win. We know the taste of failure very well. So we are very curious about the deteminants of winning the game, other than personal technologies and team cooperation with these unmeasurable data.</p>
-</div>
-<div id="data" class="section level1">
-<h1>Data</h1>
-<ul>
-<li><strong>League of Legends match data</strong></li>
-</ul>
-<p>We used <a href="https://www.kaggle.com/chuckephron/leagueoflegends">League of Legends competitive matches dataset</a> to obtain matches data between 2015 to 2018 from <a href="https://www.kaggle.com/">kaggle</a>, a data modeling and data analysis competition platform.</p>
-<div id="important-indicators-and-explanations" class="section level2">
-<h2>Important Indicators and Explanations</h2>
-<ul>
-<li><strong>Kills</strong></li>
-</ul>
-<p>Killing is a very important player behavior in League of Legends games. To be more specific, the killing can be interpreted as your controlled player, called champion in this game, kills enemy’s champion or is killed by enemy’s. It just like the Pokémon you used in the Pokémon game, which is defeated by the opponent’s Pokémon. Killing has a huge potential impact on the progress of the game. On the one hand, killing behavior will bring money to your team, so that you have more money to buy powerful equipments to make your champions stronger. On the other hand, killed enemy’s champions will enter resurrection time and they will not be able to act during resurrection time.</p>
-<ul>
-<li><strong>Tower</strong></li>
-</ul>
-<p>The way to win the League of Legends game is to destroy the opponent’s “Nexus base”. However, before reaching the “Nexus base”, your team should take down towers in order to reveal the “Nexus base”. “Nexus base” cannot be attacked before some of the towers have fallen. Also, destroying the tower can bring more money and map control to your side, which is crucial to the win.</p>
-<ul>
-<li><strong>Monsters</strong></li>
-</ul>
-<p>There are many neutral monsters in the game map. After killing certain monsters, you will get both monetary rewards and additional special effect gains, called buff in the game. Dragon (with 5 different types), Rift Herald and Baron Nashor are the three of the most important monsters.</p>
-<ul>
-<li><strong>Golds</strong></li>
-</ul>
-<p>Glod is the name of money in the game. It enables players to buy powerful equipments for champions they controlled. There are many ways to earn Glod in the game, such as the ones mentioned above: killing, taking down towers and killing netural monsters. A gold lead will give your team a huge game advantage, which will drive your team to victory.</p>
-</div>
-</div>
-<div id="methods" class="section level1">
-<h1>Methods</h1>
-</div>
-<div id="results" class="section level1">
-<h1>Results</h1>
-</div>
+<pre class="r"><code>merge_file = read_csv(&quot;./data/merge.csv&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   address = col_character(),
+##   year = col_double(),
+##   b_result = col_character(),
+##   bTowers = col_double(),
+##   rTowers = col_double(),
+##   outer_mean_diff = col_double(),
+##   golddiff_mean = col_double(),
+##   BARON_NASHOR = col_double(),
+##   DRAGON = col_double(),
+##   RIFT_HERALD = col_double(),
+##   AIR_DRAGON = col_double(),
+##   EARTH_DRAGON = col_double(),
+##   ELDER_DRAGON = col_double(),
+##   WATER_DRAGON = col_double(),
+##   FIRE_DRAGON = col_double(),
+##   bKills = col_double(),
+##   rKills = col_double(),
+##   diff = col_double()
+## )</code></pre>
+<pre class="r"><code>merge_file =
+  merge_file %&gt;% 
+  mutate(
+    b_result = recode_factor(b_result, &quot;lose&quot; = &quot;0&quot;, &quot;win&quot; = &quot;1&quot;),
+    kill_diff = diff,
+    golddiff_mean = golddiff_mean/100
+  ) %&gt;% 
+  select(-diff)
+
+final_log = merge_file %&gt;% 
+  mutate(b_result = factor(b_result)) %&gt;% 
+  glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR, family = &quot;binomial&quot;)
+ 
+final_log %&gt;% 
+  broom::tidy() %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">-1.216</td>
+<td align="right">0.100</td>
+<td align="right">-12.217</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">golddiff_mean</td>
+<td align="right">0.101</td>
+<td align="right">0.004</td>
+<td align="right">26.850</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">BARON_NASHOR</td>
+<td align="right">1.191</td>
+<td align="right">0.064</td>
+<td align="right">18.475</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">DRAGON</td>
+<td align="right">0.293</td>
+<td align="right">0.041</td>
+<td align="right">7.151</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">AIR_DRAGON</td>
+<td align="right">0.299</td>
+<td align="right">0.086</td>
+<td align="right">3.476</td>
+<td align="right">0.001</td>
+</tr>
+<tr class="even">
+<td align="left">EARTH_DRAGON</td>
+<td align="right">0.180</td>
+<td align="right">0.077</td>
+<td align="right">2.347</td>
+<td align="right">0.019</td>
+</tr>
+<tr class="odd">
+<td align="left">WATER_DRAGON</td>
+<td align="right">0.199</td>
+<td align="right">0.078</td>
+<td align="right">2.556</td>
+<td align="right">0.011</td>
+</tr>
+<tr class="even">
+<td align="left">FIRE_DRAGON</td>
+<td align="right">0.602</td>
+<td align="right">0.081</td>
+<td align="right">7.419</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">golddiff_mean:BARON_NASHOR</td>
+<td align="right">-0.031</td>
+<td align="right">0.003</td>
+<td align="right">-10.167</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>my_data =
+  merge_file %&gt;% 
+  filter(year != 2014) %&gt;% 
+  #select(-address, -year, -b_result, -bKills, -rKills, -bTowers, -rTowers) %&gt;% #
+  select(outer_mean_diff, golddiff_mean, kill_diff, BARON_NASHOR, AIR_DRAGON, FIRE_DRAGON) %&gt;%
+  rename(
+    tower = &quot;outer_mean_diff&quot;,
+    gold = &quot;golddiff_mean&quot;,
+    kill =&quot;kill_diff&quot;,
+    nashor = &quot;BARON_NASHOR&quot;,
+    air = &quot;AIR_DRAGON&quot;,
+    fire = &quot;FIRE_DRAGON&quot;
+  ) %&gt;% 
+  drop_na()
+
+res &lt;- cor(my_data)
+round(res, 3) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">tower</th>
+<th align="right">gold</th>
+<th align="right">kill</th>
+<th align="right">nashor</th>
+<th align="right">air</th>
+<th align="right">fire</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>tower</td>
+<td align="right">1.000</td>
+<td align="right">-0.374</td>
+<td align="right">-0.105</td>
+<td align="right">-0.040</td>
+<td align="right">-0.083</td>
+<td align="right">-0.024</td>
+</tr>
+<tr class="even">
+<td>gold</td>
+<td align="right">-0.374</td>
+<td align="right">1.000</td>
+<td align="right">0.789</td>
+<td align="right">0.454</td>
+<td align="right">0.155</td>
+<td align="right">0.117</td>
+</tr>
+<tr class="odd">
+<td>kill</td>
+<td align="right">-0.105</td>
+<td align="right">0.789</td>
+<td align="right">1.000</td>
+<td align="right">0.427</td>
+<td align="right">0.104</td>
+<td align="right">0.134</td>
+</tr>
+<tr class="even">
+<td>nashor</td>
+<td align="right">-0.040</td>
+<td align="right">0.454</td>
+<td align="right">0.427</td>
+<td align="right">1.000</td>
+<td align="right">0.116</td>
+<td align="right">0.079</td>
+</tr>
+<tr class="odd">
+<td>air</td>
+<td align="right">-0.083</td>
+<td align="right">0.155</td>
+<td align="right">0.104</td>
+<td align="right">0.116</td>
+<td align="right">1.000</td>
+<td align="right">0.043</td>
+</tr>
+<tr class="even">
+<td>fire</td>
+<td align="right">-0.024</td>
+<td align="right">0.117</td>
+<td align="right">0.134</td>
+<td align="right">0.079</td>
+<td align="right">0.043</td>
+<td align="right">1.000</td>
+</tr>
+</tbody>
+</table>
 
 
 
@@ -466,6 +636,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 <script>
 $(document).ready(function ()  {

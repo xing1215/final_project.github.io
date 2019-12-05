@@ -22,7 +22,7 @@ library("Hmisc")
 
 # Introduction and Motivation
 
-League of Legends (LoL) is an immensely popular multiplayer online battle arena game, with over 100 million monthly active users worldwide. It hosts progressional competitions throughout the year and had 43 million viewers in the 2016 World Championships alone. For context, that’s more than the 30.8 million viewers that watched Game 7 of the 2016 NBA finals! Published by Riot Games, LOL is clearly fun and addictive once you get started. For those who haven't, here’s a quick [overview](https://www.youtube.com/watch?v=mxxdeBIwNOs).
+League of Legends (LoL) is an immensely popular multiplayer online battle arena game, with over 100 million monthly active users worldwide. It hosts progressional competitions throughout the year and had 43 million viewers in the 2016 World Championships alone. For context, that’s more than the 30.8 million viewers that watched Game 7 of the 2016 NBA finals! Published by Riot Games, LOL is clearly fun and addictive once you get started. For those who are not familiar with the game, here’s a quick [overview](https://www.youtube.com/watch?v=mxxdeBIwNOs).
 
 10 players are divided into 2 teams (either blue or red) in the main LoL game (there are 3 modes). Before the battle begins, each player is going to declare the character, also known as champion, he/she intended to use and role-play it for the resting game. The objective for each team is to destroy the opposing team’s “Nexus”. Think of the Nexus as the main building in a base camp. Destroy the enemy Nexus and your team wins the game. Protect yours or your team loses the game. Simple enough. However, the collaboration often required between teammates to advance on the enemy Nexus, while defending its own, is wonderfully complex.
 
@@ -34,23 +34,23 @@ During the research phase, this article [use machine learning to predict the win
 
 # Initial Questions
 
-* Does picking strong champions help blue team to win the game?
+* Does picking strong champions help the blue team to win the game?
 
 * Does "Pick and Ban(P&B)" affect the result of the game? Are those champions with high win rates always being banned?
 
 * Does gold difference affect blue team's result of the game? If it does, on what scale does it affect the result?
 
-* Does kill affect blue team's result of the game? If so, how does it affect the result?
+* Does kill affect the blue team's result of the game? If so, how does it affect the result?
 
-* Does take down towers faster help blue team to win the game? 
+* Does taking down towers faster help the blue team to win the game? 
 
-* Does slaying netural mosters help blue team to win the game? If so, on what scale does it help to win the game?
+* Does slaying netural monsters help the blue team to win the game? If so, on what scale does it help to win the game?
 
 # Data Source and Data Cleaning
 
 We used [League of Legends competitive matches dataset](https://www.kaggle.com/chuckephron/leagueoflegends) to obtain matches data between 2015 to 2018 from [kaggle](https://www.kaggle.com/), a data modeling and data analysis competition platform. The complete dataset consists of eight different csv files, and each csv file contains different types of data (`_columns.csv`, `bans.csv`, `gold.csv`, `kills.csv`, `matchinfo.csv`, `monsters.csv`, `structures.csv`, `leagueoflegends.csv`). 
 
-We first glance at the content of each file. Then we filter out the useful data for processing. Turns out, there are five factors that we cared about the most --- kills, towers, monsters, champions and golds.
+We first glanced at the content of each file. Then we filtered out the useful data for processing. Turns out, there are four factors that we cared about the most --- kills, towers, monsters and golds.
 
 #### Kill data tidy code
 
@@ -67,8 +67,9 @@ kills = read_csv("./data/kills.csv") %>%
     values_from = "number") %>%
   mutate(diff = bKills - rKills)
 ```
+
 * **Kill**
-Data of kill are nested in `kills.csv` file. This file captures the information about unique match id, team id, kill numbers and the time in the game for each kill. We firstly used str() to look at variables and structure and find out that the dataset is in a longer format, because kills from red and blue teams are put in one variable 'team'. We used pivot_wider() to separate kill into two variables by teams. Then, we summarise two variable and acquired the number of kills each game for two teams. We use number of kills by blue team to substract the number of kills by red team, and create a new variable for the difference in number of kill between blue and red team.    
+Data of kill are nested in `kills.csv` file. This file records the information about unique match id, team id, kill numbers and the time in the game for each kill. We first used `str()` to look at variables and structures. We found that the dataset is in a longer format, because the number of kills for both teams are listed under the variable `Team`. We used pivot_wider() to separate the number of kills out of the old variable by team. Then, we summarized two variables and got the number of kills in each game for both teams. Afterwards, we created a new variable `diff` to represent the difference of the number of kills by each team (blue minus red).
 
 #### Towers data tidy code
 
@@ -99,7 +100,7 @@ tower =
 ```
 
 * **Towers**
-Data of towers are nested in `_columns.csv` file. This file captures the information about unique match id, team id, tower id and the time in the game for each tower being taken down.
+Data of towers are nested in `_columns.csv` file. This file records the information about unique match id, team id, tower id and the time in the game for each tower being taken down.
 
 #### Monsters data tidy code
 
@@ -125,7 +126,7 @@ monster[is.na(monster)] = 0
 ```
 
 * **Monsters**
-Data of monsters are nested in `monsters.csv` file. This file captures the information about unique match id, team id, monster id, and the number of each monster being slayed. We first imported the `monster.csv` into R and took a brief look at the data structure and variables using summary() and str() functions. Then, we filtered the data to obtain data only for blue team. After that, we grouped by the unique match id and monster types to summarize for the total number of each type of monsters being slayed for each game. In order to turn each type of monsters into separate variables, we pivoted the data from "long" to "wide". For those monsters that were not slayed in a game, the data cell that shows the number of slaying is presented by missing value. So, we manually turned these missing values into 0 indicating the certain type of monster has never being killed in a game. Since, for some types of monsters, the more times the monsters being slayed the more benefits will be brought to the team, we decided to treat the monster vairables to be continuous(number being slayed in a game) rather than categorize them(1 if being slayed in a game at least one time, 0 if never being slayed).
+Data of monsters are nested in `monsters.csv` file. This file records the information about unique match id, team id, monster id, and the number of each monster being slayed. We first imported the `monster.csv` into RStudio and took a brief look at data structures and variables using `summary()` and `str()` functions. Then, we filtered out data only for the blue team. After that, we grouped by the unique match id and monster types to summarize the total numbers of each type of monsters being slayed in each game. In order to turn each type of monsters into separate variables, we pivoted the data from "long" to "wide". For those monsters that were not slayed in a game, the data cell that shows the number of slaying is presented by missing value. So, we manually turned these missing values into 0 indicating the certain type of monster has never being killed in a game. For some types of monsters, the more times they were being slayed, the more benefits the team will receive. Due to this feature, we decide to treat the monster vairable as continuous (number being slayed in a game) rather than categorical (1 if being slayed in a game at least one time, 0 if never being slayed).
 
 #### Golds data tidy code
 
@@ -156,8 +157,6 @@ gold_ave =
 
 * **Golds**
 Data of golds are nested in `monsters.csv` file. This file captures the information about unique match id, team id, and golds quantity that each team has earned at every minute of a single game.
-* **Champions**
-Data of golds are nested in `bans.csv` file. This file captures the information about unique match id, team id, and the champions being picked and banned of a single game.
 
 ## Combine all datasets
 
@@ -184,11 +183,11 @@ merge_file <- merge_file %>%
   mutate(b_result = relevel(b_result,"lose"))
 ```
 
-After all the separate datasets were tidied, we combined them into a single integarting dataset called `merge_file` by left joining all the datasets by unique match id. This final dataset was used for most our later exploratory analyses and statistical analyses.
+After all separate datasets were tidied, we combined them into a single integarting dataset called `merge_file` by left joining all the datasets by unique match id. This final dataset was used for most of our later exploratory analyses and statistical analysis.
 
 # Exploratory Analysis
 
-First, we wanted to see whether take down towers faster help blue team to win the game. The way to win the League of Legends game is to destroy the opponent's "Nexus base". However, before reaching the "Nexus base", your team should take down towers in order to reveal the "Nexus base". "Nexus base" cannot be attacked before some of the towers have fallen. Also, destroying the tower can bring more money and map control to your side, which is crucial to the win. Hence, We want to know if destroying the towers in a shorter period of time will bring victory to the blue team. 
+First, we wanted to see whether taking down towers faster help the blue team to win the game. The way to win the game is to destroy the opponent's "Nexus base". However, before reaching oppnent's "Nexus base", their towers should first be taken down, in order to reveal the "Nexus base". "Nexus base" cannot be attacked before some of the towers have fallen. Also, destroying towers can bring more money and map control to your side, which is crucial to the win. Hence, We wanted to know if destroying towers in a shorter period of time will bring victory to the blue team. 
 
 ## Fig 1: Destroy Towers
 
@@ -204,9 +203,9 @@ merge_file %>%
 ```
 
 
-In *Fig 1*,variable *outer_mean_diff* represents the difference of average time destroying the enemy's three outer towers between blue and red team (i.e. *outer_mean_diff* = average time blue team used - average time red team used). And vairable *b_result*, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expect that the blue team has a greater chance to win the game when the **difference is negative**, meaning the blue team takes less average time to destory the red team's outer towers.
+In *Fig 1*,variable *outer_mean_diff* represents the difference of average time destroying the enemy's three outer towers between blue and red team (i.e. *outer_mean_diff* = average time blue team used - average time red team used). And vairable *b_result*, encoded as win versus lose, represents the battle results of the blue team. From the boxplot above, we expected that the blue team has a greater chance to win the game when the **difference is negative**, meaning the blue team takes less average time to destory the red team's outer towers.
 
-Next, we wanted to see if gold difference affect blue team's result of the game. Gold is the name of money in the game. It enables players to buy powerful equipments for champions they controlled. There are many ways to earn Glod in the game, such as the ones mentioned above: killing, taking down towers and killing netural monsters. A gold lead will give your team a huge game advantage, which will drive your team to victory.
+Next, we wanted to see if gold difference affects the game result for the blue team. Gold is the name of money in the game. It enables players to buy powerful equipments for champions they controlled. There are many ways to earn Gold in the game, such as the ones mentioned above: killing, taking down towers and killing netural monsters. A gold lead will give your team a huge game advantage, which will drive your team to victory.
 
 ## Fig 2 Team Golds Differences
 
@@ -222,9 +221,9 @@ merge_file %>%
 ```
 
 
-In *Fig 2*, variable *golddiff_mean* represents the average monetary difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has **more golds** than red team in average.
+In *Fig 2*, variable *golddiff_mean* represents the average monetary difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expected that the blue team has a greater chance to win when the team has **more golds** than red team in average.
 
-Next, we wanted to see if slaying netural mosters help blue team to win the game. There are many neutral monsters in the game map. After killing certain monsters, you will get both monetary rewards and additional special effect gains, called buff in the game. Dragon (with 5 different types), Rift Herald and Baron Nashor are the three of the most important monsters.
+Next, we wanted to see if slaying netural mosters help the blue team to win the game. There are many neutral monsters in the game map. After killing certain monsters, you will get both monetary rewards and additional special effect gains, called buff in the game. Dragon (with 5 different types), Rift Herald and Baron Nashor are the three of the most important monsters.
 
 ## Fig 3 Neutrals Eliminated
 
@@ -249,9 +248,9 @@ merge_file %>%
 ```
 
 
-In *Fig 3*, we try to explore which neutral monsters have a higher effects in contributing to the battle results. The largest difference exists in the kills of **Baron Nashor**. 
+In *Fig 3*, we wanted to explore the neutral monsters which has highest effect in contributing to battle results. The largest difference exists in the kills of **Baron Nashor**. 
 
-Lastly, we wanted to know whether kill affect blue team's result of the game. Kill is a very important player behavior in League of Legends games. To be more specific, the killing can be interpreted as your controlled player, called champion in this game, kills enemy’s champion or is killed by enemy’s. It just like the Pokémon you used in the Pokémon game, which is defeated by the opponent’s Pokémon. Killing has a huge potential impact on the progress of the game. On the one hand, killing behavior will bring money to your team, so that you have more money to buy powerful equipments to make your champions stronger. On the other hand, killed enemy’s champions will enter resurrection time and they will not be able to act during resurrection time.
+Lastly, we wanted to know whether kill affect blue team's result of the game. Kill is a very important player behavior in League of Legends games. To be more specific, the killing can be interpreted as your controlled player, called champion in this game, kills enemy’s champion or is killed by enemy’s. It just like the Pokémon you used in the Pokémon game, which is defeated by the opponent’s Pokémon. Killing has a huge potential impact on the progress of the game. On the one hand, killing behavior brings money to your team, so that you have more money to buy powerful equipments to make your champions stronger. On the other hand, killed enemy’s champions enters resurrection time and they are not able to act during resurrection time.
 
 ## Fig 4 Team Kills Differences
 
@@ -266,7 +265,7 @@ merge_file %>%
   )
 ```
 
-In *Fig 4*,variable *diff* represents the average kill difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expect that the blue team has a greater chance to win when the team has **more kills** than red team in average.
+In *Fig 4*,variable *diff* represents the average kill difference in every minute during the game between blue and red team (blue-red). From the boxplot, we expected that the blue team has a greater chance to win when the blue team has **more kills** than the red team in average.
 
 ###### Shiny and flex dashboard
 
@@ -276,7 +275,7 @@ We provide some interesting information about this game. You could check ban rat
 
 # Statistical Analysis
 
-We used logistic regression model to predict the log odds of win of blue team by including covariates that entailed the data for kill, towers, monsters and golds. At first, we used the original mean gold difference data value to perform the logistic model. Nontheless, mean gold differences are usually very large for most of the games like 10 thousands or even 20 thousands golds. On that account, each 1 unit of gold difference would barely contribute to predict the log odds of win and the parameter estimate of variable gold difference is very low, though significant. Thus, we further decided to divided the gold difference data by 100 to make it a 100-unit increment.
+We used logistic regression model to predict the log odds of win rate of the blue team by including covariates that entailed the data for kill, towers, monsters and golds. At first, we used the original mean gold difference data value to perform the logistic model. Nontheless, mean gold differences are usually very large for most of the games like 10 thousands or even 20 thousands golds. On that account, each 1 unit of gold difference would barely contribute to predict the log odds of win and the parameter estimate of variable gold difference is very low, though significant. Thus, we further decided to divided the gold difference data by 100 to make it a 100-unit increment.
 
 ```{r}
 merge_file =
@@ -297,13 +296,13 @@ mult_log %>%
   knitr::kable(digits = 3)
 ```
 
-From the model we saw that gold lead for blue team did help them to win the game. For each 100 golds lead, the log odds of blue team winning the game increases by 0.9%. If the blue team has gold lead by 10 thousands golds, the log odds of winning will increase by 90%!
+From the model, we saw that gold lead for the blue team did help the team to win the game. For each 100 golds lead, the log odds of the blue team winning the game increases by 0.9%. If the blue team has gold lead by 10 thousands golds, the log odds of winning will increase by 90%!
 
-Also, slaying monsters help blue team to win the game in a large extent. The most prominent effect is slaying Baron Nashor which is the thoughest monster in the game. As long as 1 Baron Nashor is slayed by blue team, the log odds of winning will be doubled!
+Also, slaying neutral monsters helps the blue team to win the game in a large extent. The most prominent effect is slaying Baron Nashor, which is the thoughest monster in the game. As long as 1 Baron Nashor is slayed by blue team, the log odds of winning will be doubled!
 
-Moreover, kills contributes to the victory of blue team a lot. During a game, if the total kills number of blue team is greater than that of the red team for merely 1, the log odds of winning of blue team increases by 45.9%. Hence, kills more champions than does the opponent team helps to win the game in general.
+Moreover, kills contributes to the victory of the blue team a lot. During a game, if the total number of kills of the blue team is greater than that of the red team for merely 1, the log odds of winning of the blue team increases by 45.9%. Hence, kills more champions than does the opponent team helps to win the game in general.
 
-However, the result shown by the `outer_mean_diff` variable, which represents the mean time difference in minute of destroying all the outer towers between blue team and red team, did not come out as we expected. From the exploratory analysis, we saw that the if the blue team destroys the outer towers faster than red team, they had a higher chance to win. Note that faster means the time difference between blue team destroying the outer towers and red team destroying the outer towers should be a negative value. Nonetheless, the positive parameter estimate from the model tells that if blue team is faster(with negative time difference), the log odds of blue team winning the game will decrease. Needless to say that this variable is statistically non-significant in the model. Therefore, we want to further investigate the relationship between towers and the game result of blue team. 
+However, the result shown by the `outer_mean_diff` variable, which represents the mean time difference in minute of destroying all the outer towers between blue team and red team, did not come out as we expected. From the exploratory analysis, we saw that the blue team has a higher chance to win if the team destroys the outer towers faster than the red team. Note that faster means that the difference time of destroying the outer towers difference between the blue team and the red team is negative. Nonetheless, the positive parameter estimate from the the model tells that the log odds of the blue team winning the game will decrease when the blue team is faster (with negative time difference). Needless to say that this variable is statistically non-significant in the model. Therefore, we wanted to further investigate the relationship between towers and the game result of blue team. 
 
 We first fitted a univariate logistic model with only `outer_mean_diff` as predictor. 
 
@@ -367,12 +366,12 @@ final_log %>%
   knitr::kable(digits = 3)
 ```
 
-Amongst two of the interaction terms, the interaction bewteen `golddiff_mean` and `BARON_NASHOR` was significant while the interaction bewteen `gloddiff_mean` and `kill_diff` was not. One thing needed to be noted here was that the coefficient of the interaction bewteen `golddiff_mean` and `BARON_NASHOR` was negative. This indicated that if blue team had both gold lead and had taken down baron nashor, the two things togther made the increament in the odds of winning by blue team less.
+Amongst two of the interaction terms, the interaction bewteen `golddiff_mean` and `BARON_NASHOR` was significant while the interaction bewteen `golddiff_mean` and `kill_diff` was not. One thing needed to be noted here was that the coefficient of the interaction bewteen `golddiff_mean` and `BARON_NASHOR` was negative. This indicated that if blue team had both gold lead and had taken down baron nashor, the two things togther made the increament in the odds of winning by blue team less.
 
 # Discussion
 
-By using the League of Legends Competitive Matches data, we were able to simply inspect what factors might affect the result of a single League of Legends game and how did those factors act on influencing the result. By employing the exploratory data analysis as well as statistical analysis, we were able to state that more kills, taking down towers faster, slaying monsters and having more golds did raise the chance of winning for blue team, even though the predictor representing taking down twoers' time was non-significant in our logistic model. But this could be explained from other perspective and we did suggested an alternative reason in the statistical analysis section. Furthermore, the correlation between covariates showed that all the variables were more or less related to golds. This makes sense since almost all the strategies and plays you make in the game are bound to help you gain more golds so that you can expand the lead for your team and win the game. 
+By using the League of Legends Competitive Matches data, we were able to inspect factors that affect the result of a single League of Legends game and their influence on the result. By employing the exploratory data analysis as well as statistical analysis, we found that more kills, less towers-taking-down time, slaying monsters and more golds increase the chance of winning for the blue team, even though the predictor representing taking down towers' time was non-significant in our logistic model. But this could be explained from other perspective and we did suggested an alternative reason in the statistical analysis section. Furthermore, the correlation between covariates showed that all the variables were more or less related to the number of golds. This makes sense since almost all the strategies and plays you make in the game are bound to help you gain more golds so that you can expand the lead for your team and win the game. 
 
-Nonetheless, there are some intrinsic problems in the data that we used. For example, most of the data consist with matches from master series(where professional players contest). All of the players are extremly skillful and adpot subtle statics. Hence, the data from these matches may look quite difference from the data from the normal matches for amateur players like us. Therefore, the external validity of the regression model inferred by the data will be hurted. The analyses we did may only be valid for analyzing professional matches. Also, the data do not include information about each champion's individual value such as attack damage value, defense value and magic ability damage value. Thus, we were not able to make any inference about the affect of the champions being picked on the result of a game. For example, what if all the 5 champions chose by blue team have higher attack damage than that of the red team? We don't know because we don't have these data.
+Nonetheless, there are some intrinsic problems in the dataset we used. For example, most of the data consist with matches from master series (where professional players contest). All of the players are extremly skillful and adpot subtle statics. Hence, the data from these matches may look quite difference from the data from the normal matches for amateur players like us. Therefore, the external validity of the regression model inferred by the data will be hurted. The analyses we did may only be valid for analyzing professional matches. Also, the dataset does not include information about each champion's individual value such as attack damage value, defense value and magic ability damage value. Thus, we were not able to make any inference about the effect of champions being picked on the result of a game. For example, what if all the 5 champions chose by the blue team have higher attack damage than that of the red team? The correlation cannot be told because we don't have these data.
 
-If we were to make further prediction for the result of a League of Legends game, we may need more information and we ought to take deeper investigation on the data.
+More information are needed for further prediction of the result of a League of Legends game, and we ought to take deeper investigation on the data.

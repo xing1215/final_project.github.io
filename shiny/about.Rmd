@@ -296,10 +296,22 @@ renderPrint({
     (1 + exp(-1.237 + 0.00075*input[["gold_range"]] + 1.192*input[["baron_nashor"]] + 0.299*input[["dragon"]] + 0.288*input[["air_dragon"]] + 0.152*input[["earth_dragon"]] + 0.203*input[["water_dragon"]] + 0.606*input[["fire_dragon"]]))
   p = p * 100
   prob = p %>% round(digits = 2) %>% paste("%") %>% as.character()
-  prob = str_c("Your winning probability is ", prob)
-  prob
+  
+  str_c("Your winning probability is ", prob)
 })
 ```
 
+**Description**
 
+Gold difference: the average gold difference of the whole game, computed by blue minus red
+
+Number of baron nashor: the total numbers of baron nashor killed by blue team
+
+(Similar definition can be applied to: dragon, air dragon, erath dragon, water dragon, fire dragon)
+
+*Note: *
+
+data of league of legends match info from 2015 to 2018 were used to make predictions
+
+the sliderInput widget of dragon can only be used to predict the game result prior to 2016 (After 2016, the neutral monster, dragon, was splitted into different types of dragon, like air dragon...)
 

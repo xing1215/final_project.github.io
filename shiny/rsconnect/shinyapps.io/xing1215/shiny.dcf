@@ -5,6 +5,6 @@ account: xing1215
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 1557209
-bundleId: 2642097
+bundleId: 2642499
 url: https://xing1215.shinyapps.io/shiny/
-when: 1575502118.73485
+when: 1575514978.16828

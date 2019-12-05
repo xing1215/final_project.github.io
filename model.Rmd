@@ -74,7 +74,4 @@ round(res, 3) %>%
 
 **Result**
 
-We saw that the correaltion between golds and kills was 0.789 > 0.50, meaning that there is a high correlation between these two variables, 
-
-
-This correlation value was very high in respective to other variables. The finding convinced us that a large part of effect from variable `kill_diff` can in fact be explained by the effect from `golddiff_mean`. On this account, we suspected that the effect of other variables on the blue team's result of a game might be modified by the effect of gold difference. So we tried adding interaction terms into our full model. Specifically, we made `golddiff_mean` to interact with only `kill_diff` and all the monsters variable `Baron_Nashor`. The reason we did so was that these two variables had the largest effect size and were significant under the full model.
+We saw that the correaltion between golds and kills was 0.789 > 0.50, meaning that there is a high correlation between these two variables; Besides, there are meddle level correlations between gold and tower (R=-0.374), gold and nashor(R=0.454), kill and nashor(R=0.427). The findings convinced us that a large part of effect from variable `kill_diff` can in fact be explained by the effect from `golddiff_mean`. Killing Baron Nashor has its gold bouns and its process always accompany with team fight, which can bring killing differences. On this account, we highly suspected that the effect of kill difference variable on the blue team's result of a game might be modified by the effect of gold difference. So we finally decided to remove kill difference from our final model in order to keeping prediction accurancy.

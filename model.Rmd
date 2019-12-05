@@ -44,10 +44,16 @@ final_log = merge_file %>%
   mutate(b_result = factor(b_result)) %>% 
   glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR, family = "binomial")
  
-final_log %>% 
-  broom::tidy() %>% 
-  knitr::kable(digits = 3)
+log_table = final_log %>% broom::tidy() 
+log_table %>% knitr::kable(digits = 3)
+
 ```
+
+The Final model statement:
+logit(Pr(b_result=1)) = `round(pull(log_table,estimate)[1],digits=3)` + `pull(log_table,estimate)[2]`golddiff_mean + `round(pull(log_table,estimate)[3],digits=3)`BARON_NASHOR + `round(pull(log_table,estimate)[4],digits=3)`DRAGON + `round(pull(log_table,estimate)[5],digits=3)`AIR_DRAGON + `round(pull(log_table,estimate)[6],digits=3)`EARTH_DRAGON + `round(pull(log_table,estimate)[7],digits=3)`WATER_DRAGON + `round(pull(log_table,estimate)[8],digits=3)`FIRE_DRAGON + `round(pull(log_table,estimate)[9],digits=3)`(golddiff_mean:BARON_NASHOR)
+
+
+
 
 ## Correlation Test
 

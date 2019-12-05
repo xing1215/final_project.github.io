@@ -12,6 +12,7 @@ library(tidyverse)
 library(readr)
 library(scales)
 library("Hmisc")
+library(corrplot)
 
 knitr::opts_chunk$set(
 	echo = TRUE,
@@ -78,15 +79,16 @@ round(res, 3) %>%
   knitr::kable()
 
 res2 = Hmisc::rcorr(as.matrix(my_data))
-res2[1] %>% knitr::kable(digits = 3) ## correlation r
+#res2[1] %>% knitr::kable(digits = 3) ## correlation r
 res2[3] %>% knitr::kable(digits = 3) ## p-value
-
-res %>% corrplot::corrplot() ## create plot to show the correlation 
-
-
-
 ```
 
 **Result**
 
-We saw that the correaltion between golds and kills was 0.789 > 0.50, meaning that there is a high correlation between these two variables; Besides, there are meddle level correlations between gold and tower (R=-0.374), gold and nashor(R=0.454), kill and nashor(R=0.427). The findings convinced us that a large part of effect from variable `kill_diff` can in fact be explained by the effect from `golddiff_mean`. Killing Baron Nashor has its gold bouns and its process always accompany with team fight, which can bring killing differences. On this account, we highly suspected that the effect of kill difference variable on the blue team's result of a game might be modified by the effect of gold difference. So we finally decided to remove kill difference from our final model in order to keeping prediction accurancy.
+We saw that the correaltion between *gold* and *kill* was 0.789 > 0.50, meaning that there is a **high correlation** between these two variables; Besides, there are **meddle level correlations** between *gold* and *tower* (R=-0.374), *gold* and *nashor*(R=0.454), *kill* and *nashor*(R=0.427). All correlations except *tower* and *fire dragon* are **statistically significant** (all p-value < 0.01,between *tower* and *fire dragon* p-value = 0.062 > 0.05). The findings convinced us that a large part of effect from variable `kill difference` can in fact be explained by the effect from `gold difference`. Also killing Baron Nashor has its gold bouns and its processes always accompany with team fight, which can bring killing differences. On this account, we highly suspected that the effect of kill difference variable on the blue team's result of a game might be modified by the effect of gold difference. So we finally decided to remove kill difference from our final model in order to keeping prediction accurancy. 
+
+```{r}
+res %>% corrplot::corrplot() ## create plot to show the correlation 
+```
+
+The correlation plot provide us a more direct view of the degree of correlations.

@@ -434,9 +434,8 @@ final_log = merge_file %&gt;%
   mutate(b_result = factor(b_result)) %&gt;% 
   glm(formula =  b_result ~ golddiff_mean + BARON_NASHOR + DRAGON + AIR_DRAGON + EARTH_DRAGON + WATER_DRAGON + FIRE_DRAGON +golddiff_mean:BARON_NASHOR, family = &quot;binomial&quot;)
  
-final_log %&gt;% 
-  broom::tidy() %&gt;% 
-  knitr::kable(digits = 3)</code></pre>
+log_table = final_log %&gt;% broom::tidy() 
+log_table %&gt;% knitr::kable(digits = 3)</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -513,6 +512,9 @@ final_log %&gt;%
 </tr>
 </tbody>
 </table>
+<p>The Final model statement: logit(Pr(b_result=1)) = <code>round(pull(log_table,estimate)[1],digits=3)</code> + <code>pull(log_table,estimate)[2]</code>golddiff_mean + <code>round(pull(log_table,estimate)[3],digits=3)</code>BARON_NASHOR + <code>round(pull(log_table,estimate)[4],digits=3)</code>DRAGON + <code>round(pull(log_table,estimate)[5],digits=3)</code>AIR_DRAGON + <code>round(pull(log_table,estimate)[6],digits=3)</code>EARTH_DRAGON + <code>round(pull(log_table,estimate)[7],digits=3)</code>WATER_DRAGON + <code>round(pull(log_table,estimate)[8],digits=3)</code>FIRE_DRAGON + <code>round(pull(log_table,estimate)[9],digits=3)</code>(golddiff_mean:BARON_NASHOR)</p>
+<div id="correlation-test" class="section level2">
+<h2>Correlation Test</h2>
 <pre class="r"><code>my_data =
   merge_file %&gt;% 
   filter(year != 2014) %&gt;% 
@@ -600,6 +602,92 @@ round(res, 3) %&gt;%
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>res2 = Hmisc::rcorr(as.matrix(my_data))
+#res2[1] %&gt;% knitr::kable(digits = 3) ## correlation r
+res2[3] %&gt;% knitr::kable(digits = 3) ## p-value</code></pre>
+<table class="kable_wrapper">
+<tbody>
+<tr>
+<td>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">tower</th>
+<th align="right">gold</th>
+<th align="right">kill</th>
+<th align="right">nashor</th>
+<th align="right">air</th>
+<th align="right">fire</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>tower</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.002</td>
+<td align="right">0.000</td>
+<td align="right">0.062</td>
+</tr>
+<tr class="even">
+<td>gold</td>
+<td align="right">0.000</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td>kill</td>
+<td align="right">0.000</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td>nashor</td>
+<td align="right">0.002</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td>air</td>
+<td align="right">0.000</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.000</td>
+<td align="right">NA</td>
+<td align="right">0.001</td>
+</tr>
+<tr class="even">
+<td>fire</td>
+<td align="right">0.062</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.000</td>
+<td align="right">0.001</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Result</strong></p>
+<p>We saw that the correaltion between <em>gold</em> and <em>kill</em> was 0.789 &gt; 0.50, meaning that there is a <strong>high correlation</strong> between these two variables; Besides, there are <strong>meddle level correlations</strong> between <em>gold</em> and <em>tower</em> (R=-0.374), <em>gold</em> and <em>nashor</em>(R=0.454), <em>kill</em> and <em>nashor</em>(R=0.427). All correlations except <em>tower</em> and <em>fire dragon</em> are <strong>statistically significant</strong> (all p-value &lt; 0.01,between <em>tower</em> and <em>fire dragon</em> p-value = 0.062 &gt; 0.05). The findings convinced us that a large part of effect from variable <code>kill difference</code> can in fact be explained by the effect from <code>gold difference</code>. Also killing Baron Nashor has its gold bouns and its processes always accompany with team fight, which can bring killing differences. On this account, we highly suspected that the effect of kill difference variable on the blue team’s result of a game might be modified by the effect of gold difference. So we finally decided to remove kill difference from our final model in order to keeping prediction accurancy.</p>
+<pre class="r"><code>res %&gt;% corrplot::corrplot() ## create plot to show the correlation </code></pre>
+<p><img src="model_files/figure-html/unnamed-chunk-3-1.png" width="90%" /></p>
+<p>The correlation plot provide us a more direct view of the degree of correlations.</p>
+</div>
 
 
 

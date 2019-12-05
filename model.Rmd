@@ -30,7 +30,9 @@ scale_fill_discrete = scale_fill_viridis_d
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
 
-```{r}
+# Final Model Statement
+
+```{r, warning = FALSE, message = FALSE}
 merge_file = read_csv("./data/merge.csv")
 merge_file =
   merge_file %>% 
@@ -51,14 +53,24 @@ log_table %>% knitr::kable(digits = 3)
 ```
 
 The Final model statement:
-logit(Pr(b_result=1)) = `round(pull(log_table,estimate)[1],digits=3)` + `pull(log_table,estimate)[2]`golddiff_mean + `round(pull(log_table,estimate)[3],digits=3)`BARON_NASHOR + `round(pull(log_table,estimate)[4],digits=3)`DRAGON + `round(pull(log_table,estimate)[5],digits=3)`AIR_DRAGON + `round(pull(log_table,estimate)[6],digits=3)`EARTH_DRAGON + `round(pull(log_table,estimate)[7],digits=3)`WATER_DRAGON + `round(pull(log_table,estimate)[8],digits=3)`FIRE_DRAGON + `round(pull(log_table,estimate)[9],digits=3)`(golddiff_mean:BARON_NASHOR)
+
+**logit(Pr(b_result=1)) = `r round(pull(log_table,estimate)[1],digits=3)` + `r pull(log_table,estimate)[2]`golddiff_mean + `r round(pull(log_table,estimate)[3],digits=3)`BARON_NASHOR + `r round(pull(log_table,estimate)[4],digits=3)`DRAGON + `r round(pull(log_table,estimate)[5],digits=3)`AIR_DRAGON + `r round(pull(log_table,estimate)[6],digits=3)`EARTH_DRAGON + `r round(pull(log_table,estimate)[7],digits=3)`WATER_DRAGON + `r round(pull(log_table,estimate)[8],digits=3)`FIRE_DRAGON + `r round(pull(log_table,estimate)[9],digits=3)`(golddiff_mean:BARON_NASHOR)**
+
+note:
+
+*All variables in this model are statistically significant  (p-value < 0.01).
+
+*1 unit change on `golddiff_mean` implicates that 100 gold changes on mean team gold difference. 
+
+*Dragon are recorded in data before 2016, while the `specific types of dragon` are recorded from 2016. Therefore, `dragon` and `specific dragons` are mutually exclusive (e.g. when `fire gragon` in model = 1, then `dragon` must be = 0) 
+
+# Correlation
 
 
+## 1. Correlation test
 
 
-## Correlation Test
-
-```{r}
+```{r, warning = FALSE, message = FALSE}
 my_data =
   merge_file %>% 
   filter(year != 2014) %>% 
@@ -83,12 +95,14 @@ res2 = Hmisc::rcorr(as.matrix(my_data))
 res2[3] %>% knitr::kable(digits = 3) ## p-value
 ```
 
-**Result**
+We saw that the correaltion between `gold` and `kill` was 0.789 > 0.50, meaning that there is a **high correlation** between these two variables; Besides, there are **meddle level correlations** between `gold` and `tower` (R=-0.374), `gold` and `nashor` (R=0.454), `kill` and `nashor` (R=0.427). All correlations except `tower` and `fire dragon` are **statistically significant** (all p-value < 0.01,between `tower` and `fire dragon` p-value = 0.062 > 0.05). The findings convinced us that a large part of effect from variable `kill difference` can in fact be explained by the effect from `gold difference`. Also killing Baron Nashor has its gold bouns and its processes always accompany with team fight, which can bring killing differences. 
 
-We saw that the correaltion between *gold* and *kill* was 0.789 > 0.50, meaning that there is a **high correlation** between these two variables; Besides, there are **meddle level correlations** between *gold* and *tower* (R=-0.374), *gold* and *nashor*(R=0.454), *kill* and *nashor*(R=0.427). All correlations except *tower* and *fire dragon* are **statistically significant** (all p-value < 0.01,between *tower* and *fire dragon* p-value = 0.062 > 0.05). The findings convinced us that a large part of effect from variable `kill difference` can in fact be explained by the effect from `gold difference`. Also killing Baron Nashor has its gold bouns and its processes always accompany with team fight, which can bring killing differences. On this account, we highly suspected that the effect of kill difference variable on the blue team's result of a game might be modified by the effect of gold difference. So we finally decided to remove kill difference from our final model in order to keeping prediction accurancy. 
 
-```{r}
+## 2. Correlation plot
+
+
+```{r, warning = FALSE, message = FALSE}
 res %>% corrplot::corrplot() ## create plot to show the correlation 
 ```
 
-The correlation plot provide us a more direct view of the degree of correlations.
+The correlation plot provide us a more direct view of the degree of correlations. As we can see, `gold` and `kill` are in dark blue dot. relation between `nashor` and `gold`, `nashor` and `kill`, `gold` and `tower` are shows in plot by a intermediate level color dots. Rest of correlations are in light dots.

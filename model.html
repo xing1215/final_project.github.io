@@ -399,29 +399,10 @@ div.tocify {
 </div>
 
 
-<pre class="r"><code>merge_file = read_csv(&quot;./data/merge.csv&quot;)</code></pre>
-<pre><code>## Parsed with column specification:
-## cols(
-##   address = col_character(),
-##   year = col_double(),
-##   b_result = col_character(),
-##   bTowers = col_double(),
-##   rTowers = col_double(),
-##   outer_mean_diff = col_double(),
-##   golddiff_mean = col_double(),
-##   BARON_NASHOR = col_double(),
-##   DRAGON = col_double(),
-##   RIFT_HERALD = col_double(),
-##   AIR_DRAGON = col_double(),
-##   EARTH_DRAGON = col_double(),
-##   ELDER_DRAGON = col_double(),
-##   WATER_DRAGON = col_double(),
-##   FIRE_DRAGON = col_double(),
-##   bKills = col_double(),
-##   rKills = col_double(),
-##   diff = col_double()
-## )</code></pre>
-<pre class="r"><code>merge_file =
+<div id="final-model-statement" class="section level1">
+<h1>Final Model Statement</h1>
+<pre class="r"><code>merge_file = read_csv(&quot;./data/merge.csv&quot;)
+merge_file =
   merge_file %&gt;% 
   mutate(
     b_result = recode_factor(b_result, &quot;lose&quot; = &quot;0&quot;, &quot;win&quot; = &quot;1&quot;),
@@ -512,9 +493,17 @@ log_table %&gt;% knitr::kable(digits = 3)</code></pre>
 </tr>
 </tbody>
 </table>
-<p>The Final model statement: logit(Pr(b_result=1)) = <code>round(pull(log_table,estimate)[1],digits=3)</code> + <code>pull(log_table,estimate)[2]</code>golddiff_mean + <code>round(pull(log_table,estimate)[3],digits=3)</code>BARON_NASHOR + <code>round(pull(log_table,estimate)[4],digits=3)</code>DRAGON + <code>round(pull(log_table,estimate)[5],digits=3)</code>AIR_DRAGON + <code>round(pull(log_table,estimate)[6],digits=3)</code>EARTH_DRAGON + <code>round(pull(log_table,estimate)[7],digits=3)</code>WATER_DRAGON + <code>round(pull(log_table,estimate)[8],digits=3)</code>FIRE_DRAGON + <code>round(pull(log_table,estimate)[9],digits=3)</code>(golddiff_mean:BARON_NASHOR)</p>
+<p>The Final model statement:</p>
+<p><strong>logit(Pr(b_result=1)) = -1.216 + 0.101141golddiff_mean + 1.191BARON_NASHOR + 0.293DRAGON + 0.299AIR_DRAGON + 0.18EARTH_DRAGON + 0.199WATER_DRAGON + 0.602FIRE_DRAGON + -0.031(golddiff_mean:BARON_NASHOR)</strong></p>
+<p>note:</p>
+<p>*All variables in this model are statistically significant (p-value &lt; 0.01).</p>
+<p>*1 unit change on <code>golddiff_mean</code> implicates that 100 gold changes on mean team gold difference.</p>
+<p>*Dragon are recorded in data before 2016, while the <code>specific types of dragon</code> are recorded from 2016. Therefore, <code>dragon</code> and <code>specific dragons</code> are mutually exclusive (e.g. when <code>fire gragon</code> in model = 1, then <code>dragon</code> must be = 0)</p>
+</div>
+<div id="correlation" class="section level1">
+<h1>Correlation</h1>
 <div id="correlation-test" class="section level2">
-<h2>Correlation Test</h2>
+<h2>1. Correlation test</h2>
 <pre class="r"><code>my_data =
   merge_file %&gt;% 
   filter(year != 2014) %&gt;% 
@@ -682,11 +671,14 @@ res2[3] %&gt;% knitr::kable(digits = 3) ## p-value</code></pre>
 </tr>
 </tbody>
 </table>
-<p><strong>Result</strong></p>
-<p>We saw that the correaltion between <em>gold</em> and <em>kill</em> was 0.789 &gt; 0.50, meaning that there is a <strong>high correlation</strong> between these two variables; Besides, there are <strong>meddle level correlations</strong> between <em>gold</em> and <em>tower</em> (R=-0.374), <em>gold</em> and <em>nashor</em>(R=0.454), <em>kill</em> and <em>nashor</em>(R=0.427). All correlations except <em>tower</em> and <em>fire dragon</em> are <strong>statistically significant</strong> (all p-value &lt; 0.01,between <em>tower</em> and <em>fire dragon</em> p-value = 0.062 &gt; 0.05). The findings convinced us that a large part of effect from variable <code>kill difference</code> can in fact be explained by the effect from <code>gold difference</code>. Also killing Baron Nashor has its gold bouns and its processes always accompany with team fight, which can bring killing differences. On this account, we highly suspected that the effect of kill difference variable on the blue team’s result of a game might be modified by the effect of gold difference. So we finally decided to remove kill difference from our final model in order to keeping prediction accurancy.</p>
+<p>We saw that the correaltion between <code>gold</code> and <code>kill</code> was 0.789 &gt; 0.50, meaning that there is a <strong>high correlation</strong> between these two variables; Besides, there are <strong>meddle level correlations</strong> between <code>gold</code> and <code>tower</code> (R=-0.374), <code>gold</code> and <code>nashor</code> (R=0.454), <code>kill</code> and <code>nashor</code> (R=0.427). All correlations except <code>tower</code> and <code>fire dragon</code> are <strong>statistically significant</strong> (all p-value &lt; 0.01,between <code>tower</code> and <code>fire dragon</code> p-value = 0.062 &gt; 0.05). The findings convinced us that a large part of effect from variable <code>kill difference</code> can in fact be explained by the effect from <code>gold difference</code>. Also killing Baron Nashor has its gold bouns and its processes always accompany with team fight, which can bring killing differences.</p>
+</div>
+<div id="correlation-plot" class="section level2">
+<h2>2. Correlation plot</h2>
 <pre class="r"><code>res %&gt;% corrplot::corrplot() ## create plot to show the correlation </code></pre>
 <p><img src="model_files/figure-html/unnamed-chunk-3-1.png" width="90%" /></p>
-<p>The correlation plot provide us a more direct view of the degree of correlations.</p>
+<p>The correlation plot provide us a more direct view of the degree of correlations. As we can see, <code>gold</code> and <code>kill</code> are in dark blue dot. relation between <code>nashor</code> and <code>gold</code>, <code>nashor</code> and <code>kill</code>, <code>gold</code> and <code>tower</code> are shows in plot by a intermediate level color dots. Rest of correlations are in light dots.</p>
+</div>
 </div>
 
 

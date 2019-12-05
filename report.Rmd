@@ -100,7 +100,7 @@ tower =
 ```
 
 * **Towers**
-Data of towers are nested in `_columns.csv` file. This file records the information about unique match id, team id, tower id and the time in the game for each tower being taken down.
+Data of towers are nested in `_columns.csv` file. This file records the information about unique match id, team id, tower id and the time in the game for each tower being taken down. We first read in and clean the dataset `structures.csv` and then filter the type of tower to "outer_turret" because we are only interested in the time that outer turrets are destroyed. Then we calculate the mean times of destroying outer turret of each team in each game and calculate the difference between the mean times, calculated by blue team minus red team
 
 #### Monsters data tidy code
 

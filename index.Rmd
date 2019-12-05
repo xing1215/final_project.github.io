@@ -49,7 +49,7 @@ Gold is the name of money in the game. It enables players to buy powerful equipm
 
 # Methods
 
-We conducted [exploratory data analysis](visualization.html) to describe the relationship between the blue team's game result and the four main predictors. In order to viausalize their relationships, we constructed several graphs to seek the potential associations. Statistical analysis was performed, specifically the exploration of the correlation between the four covariates. Furthermore, we employed [logistic regression](model.html) to model the effect of the four main predictors on the blue team's game result. Interaction terms were introduced based on findings on correaltions. The relative effect (odds ratio) was measured and was further applied in our tool for [blue team win rate prediction](https://xing1215.shinyapps.io/shiny/#section-winning-rate-simulator).
+We conducted [exploratory data analysis](visualization.html) to describe the relationship between the blue team's game result and the four main predictors. In order to visualize their relationships, we constructed several graphs to seek the potential associations. Statistical analysis was performed, specifically the exploration of the correlation between the four covariates. Furthermore, we employed [logistic regression](model.html) to model the effect of the four main predictors on the blue team's game result. Interaction terms were introduced based on findings on correaltions. The relative effect (odds ratio) was measured and was further applied in our tool for [blue team win rate prediction](https://xing1215.shinyapps.io/shiny/#section-winning-rate-simulator).
 
 # Results
 
